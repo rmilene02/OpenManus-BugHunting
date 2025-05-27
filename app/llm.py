@@ -41,6 +41,13 @@ MULTIMODAL_MODELS = [
     "claude-3-haiku-20240307",
 ]
 
+# DeepSeek models
+DEEPSEEK_MODELS = [
+    "deepseek-chat",
+    "deepseek-coder",
+    "deepseek-reasoner",
+]
+
 
 class TokenCounter:
     # Token constants
@@ -227,6 +234,12 @@ class LLM:
                 )
             elif self.api_type == "aws":
                 self.client = BedrockClient()
+            elif self.api_type == "deepseek":
+                # DeepSeek uses OpenAI-compatible API
+                self.client = AsyncOpenAI(
+                    api_key=self.api_key, 
+                    base_url=self.base_url or "https://api.deepseek.com"
+                )
             else:
                 self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
 

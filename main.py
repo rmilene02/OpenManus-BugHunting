@@ -260,6 +260,13 @@ Examples:
     )
     
     ai_group.add_argument(
+        '--llm-api-type',
+        choices=['openai', 'azure', 'deepseek', 'aws'],
+        default='openai',
+        help='Type of LLM API to use (default: openai)'
+    )
+    
+    ai_group.add_argument(
         '--disable-ai',
         action='store_true',
         help='Disable AI-powered tool selection (use fallback rules)'
@@ -379,16 +386,25 @@ async def main():
             import os
             from app.config import LLMSettings
             
-            api_key = args.llm_api_key or os.getenv('OPENAI_API_KEY')
+            # Get API key based on API type
+            if args.llm_api_type == 'deepseek':
+                api_key = args.llm_api_key or os.getenv('DEEPSEEK_API_KEY')
+                default_base_url = 'https://api.deepseek.com'
+                default_model = 'deepseek-chat'
+            else:
+                api_key = args.llm_api_key or os.getenv('OPENAI_API_KEY')
+                default_base_url = 'https://api.openai.com/v1'
+                default_model = 'gpt-4'
+            
             if api_key:
                 # Create a custom LLM config
                 llm_config = LLMSettings(
-                    model=args.llm_model,
+                    model=args.llm_model if args.llm_model != 'gpt-4' else default_model,
                     api_key=api_key,
-                    base_url=args.llm_base_url,
+                    base_url=args.llm_base_url if args.llm_base_url != 'https://api.openai.com/v1' else default_base_url,
                     temperature=args.ai_temperature,
                     max_tokens=4000,
-                    api_type="openai",
+                    api_type=args.llm_api_type,
                     api_version="2024-02-01"
                 )
                 
@@ -397,7 +413,10 @@ async def main():
                 logger.info(f"🤖 AI-powered tool selection enabled with {args.llm_model}")
             else:
                 logger.warning("⚠️  No LLM API key provided, AI features disabled")
-                logger.warning("   Set OPENAI_API_KEY environment variable or use --llm-api-key")
+                if args.llm_api_type == 'deepseek':
+                    logger.warning("   Set DEEPSEEK_API_KEY environment variable or use --llm-api-key")
+                else:
+                    logger.warning("   Set OPENAI_API_KEY environment variable or use --llm-api-key")
         except Exception as e:
             logger.error(f"❌ Failed to initialize LLM client: {e}")
             logger.warning("🔄 Falling back to rule-based tool selection")
