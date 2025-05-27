@@ -377,14 +377,23 @@ async def main():
     if not args.disable_ai:
         try:
             import os
+            from app.config import LLMSettings
+            
             api_key = args.llm_api_key or os.getenv('OPENAI_API_KEY')
             if api_key:
-                llm_client = LLMClient(
+                # Create a custom LLM config
+                llm_config = LLMSettings(
                     model=args.llm_model,
                     api_key=api_key,
                     base_url=args.llm_base_url,
-                    temperature=args.ai_temperature
+                    temperature=args.ai_temperature,
+                    max_tokens=4000,
+                    api_type="openai",
+                    api_version="2024-02-01"
                 )
+                
+                # Create LLM instance with custom config
+                llm_client = LLM(config_name="custom", llm_config={"custom": llm_config})
                 logger.info(f"🤖 AI-powered tool selection enabled with {args.llm_model}")
             else:
                 logger.warning("⚠️  No LLM API key provided, AI features disabled")
