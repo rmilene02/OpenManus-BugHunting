@@ -11,6 +11,10 @@ Provides comprehensive subdomain discovery capabilities using multiple technique
 import asyncio
 import dns.resolver
 import requests
+import urllib3
+
+# Disable SSL warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import socket
 import ssl
 import json

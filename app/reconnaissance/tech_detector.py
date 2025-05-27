@@ -11,6 +11,10 @@ import re
 from typing import Dict, List, Optional, Set
 from pathlib import Path
 import requests
+import urllib3
+
+# Disable SSL warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from bs4 import BeautifulSoup
 
 from app.logger import logger

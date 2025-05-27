@@ -12,8 +12,12 @@ import string
 from typing import Dict, List, Optional, Any
 from pathlib import Path
 import requests
+import urllib3
 
 from app.logger import logger
+
+# Disable SSL warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class ParameterFuzzer:

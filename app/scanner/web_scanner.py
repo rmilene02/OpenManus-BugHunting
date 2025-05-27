@@ -11,6 +11,10 @@ import asyncio
 import json
 import re
 import requests
+import urllib3
+
+# Disable SSL warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 from typing import Dict, List, Optional, Any
 from urllib.parse import urljoin, urlparse
 from app.reconnaissance.kali_tools import KaliToolsManager

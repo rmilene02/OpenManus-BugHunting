@@ -154,8 +154,19 @@ class AIReconEngine:
         try:
             result = subprocess.run(['which', tool_name], 
                                   capture_output=True, text=True, timeout=5)
-            return result.returncode == 0
+            is_available = result.returncode == 0
+            
+            # If tool is not found but we're in a demo environment, simulate availability
+            if not is_available and os.getenv('OPENMANUS_DEMO_MODE', 'false').lower() == 'true':
+                logger.debug(f"Demo mode: Simulating availability of {tool_name}")
+                return True
+                
+            return is_available
         except (subprocess.TimeoutExpired, FileNotFoundError):
+            # In demo mode, simulate tool availability
+            if os.getenv('OPENMANUS_DEMO_MODE', 'false').lower() == 'true':
+                logger.debug(f"Demo mode: Simulating availability of {tool_name}")
+                return True
             return False
     
     async def ai_powered_reconnaissance(self, 
@@ -308,25 +319,30 @@ class AIReconEngine:
         logger.info(f"Executing {tool_name}")
         
         try:
+            # Normalize tool name to lowercase for comparison
+            tool_lower = tool_name.lower()
+            
             # Route to appropriate tool execution method
-            if tool_name == 'subfinder':
+            if tool_lower in ['subfinder']:
                 return await self._run_subfinder()
-            elif tool_name == 'amass':
+            elif tool_lower in ['amass']:
                 return await self._run_amass()
-            elif tool_name == 'assetfinder':
+            elif tool_lower in ['assetfinder']:
                 return await self._run_assetfinder()
-            elif tool_name == 'httpx':
+            elif tool_lower in ['httpx']:
                 return await self._run_httpx()
-            elif tool_name == 'whatweb':
+            elif tool_lower in ['whatweb']:
                 return await self._run_whatweb()
-            elif tool_name == 'nmap':
+            elif tool_lower in ['nmap']:
                 return await self._run_nmap()
-            elif tool_name == 'nuclei':
+            elif tool_lower in ['nuclei']:
                 return await self._run_nuclei()
-            elif tool_name == 'gobuster':
+            elif tool_lower in ['gobuster']:
                 return await self._run_gobuster()
-            elif tool_name == 'theharvester':
+            elif tool_lower in ['theharvester', 'harvester']:
                 return await self._run_theharvester()
+            elif tool_lower in ['nikto']:
+                return await self._run_nikto()
             else:
                 logger.warning(f"No execution method for tool: {tool_name}")
                 return {'error': f'No execution method for {tool_name}'}
@@ -720,6 +736,50 @@ class AIReconEngine:
         except Exception as e:
             return {
                 'tool': 'theharvester',
+                'success': False,
+                'error': str(e)
+            }
+    
+    async def _run_nikto(self) -> Dict[str, Any]:
+        """Execute nikto for web vulnerability scanning"""
+        target_url = self.target if self.target.startswith('http') else f"http://{self.target}"
+        command = ['nikto', '-h', target_url, '-Format', 'json', '-output', '-']
+        
+        try:
+            process = await asyncio.create_subprocess_exec(
+                *command,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE
+            )
+            
+            stdout, stderr = await process.communicate()
+            
+            if process.returncode == 0:
+                output = stdout.decode()
+                vulnerabilities = []
+                
+                # Parse nikto output (simplified)
+                for line in output.split('\n'):
+                    if line.strip() and ('OSVDB' in line or 'CVE' in line or 'vulnerability' in line.lower()):
+                        vulnerabilities.append(line.strip())
+                
+                return {
+                    'tool': 'nikto',
+                    'success': True,
+                    'vulnerabilities': vulnerabilities,
+                    'count': len(vulnerabilities),
+                    'raw_output': output
+                }
+            else:
+                return {
+                    'tool': 'nikto',
+                    'success': False,
+                    'error': stderr.decode()
+                }
+                
+        except Exception as e:
+            return {
+                'tool': 'nikto',
                 'success': False,
                 'error': str(e)
             }

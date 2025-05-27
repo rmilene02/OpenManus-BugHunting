@@ -13,10 +13,14 @@ import re
 import requests
 import random
 import string
+import urllib3
 from typing import Dict, List, Optional, Any, Tuple
 from urllib.parse import urljoin, urlparse, parse_qs, urlencode
 from app.reconnaissance.kali_tools import KaliToolsManager
 from app.logger import logger
+
+# Disable SSL warnings
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class WebFuzzer:
