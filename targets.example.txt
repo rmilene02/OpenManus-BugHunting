@@ -1,0 +1,47 @@
+# OpenManus-BugHunting Target List Example
+# 
+# This file contains example targets for security testing.
+# Lines starting with # are comments and will be ignored.
+# 
+# IMPORTANT: Only test targets you own or have explicit permission to test!
+# Unauthorized testing is illegal and unethical.
+
+# Example domains (replace with your authorized targets)
+example.com
+test.example.com
+staging.example.com
+
+# You can also include URLs
+https://example.com
+http://test.example.com:8080
+
+# IP addresses are also supported
+192.168.1.100
+10.0.0.50
+
+# Subdomains
+api.example.com
+admin.example.com
+dev.example.com
+staging.example.com
+
+# Different protocols and ports
+https://example.com:8443
+http://example.com:8080
+ftp://example.com:21
+
+# Bug bounty targets (example - replace with actual authorized targets)
+# hackerone.com
+# bugcrowd.com
+
+# Internal testing targets
+# localhost
+# 127.0.0.1
+# internal.company.com
+
+# Notes:
+# - One target per line
+# - Comments start with #
+# - Empty lines are ignored
+# - Supports domains, IPs, URLs with ports
+# - Always ensure you have permission to test these targets!

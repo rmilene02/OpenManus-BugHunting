@@ -1,0 +1,307 @@
+# OpenManus-BugHunting Configuration File
+# Copy this file to config.yaml and customize as needed
+
+# Global settings
+global:
+  # Default output directory
+  output_dir: "./results"
+  
+  # Default number of threads
+  threads: 10
+  
+  # Default timeout for requests (seconds)
+  timeout: 30
+  
+  # Rate limiting (requests per second)
+  rate_limit: 10
+  
+  # Default User-Agent string
+  user_agent: "OpenManus-BugHunting/1.0 (Security Scanner)"
+  
+  # Proxy settings (optional)
+  # proxy: "http://127.0.0.1:8080"
+  
+  # Custom headers (optional)
+  headers: {}
+    # X-Custom-Header: "Value"
+
+# Reconnaissance module settings
+reconnaissance:
+  # Enable deep scanning (more thorough but slower)
+  deep_scan: false
+  
+  # Use only passive techniques
+  passive_only: false
+  
+  # Subdomain enumeration tools
+  subdomain_tools:
+    - subfinder
+    - amass
+    - assetfinder
+    - sublist3r
+  
+  # DNS settings
+  dns:
+    # DNS servers to use
+    servers:
+      - "8.8.8.8"
+      - "1.1.1.1"
+    
+    # DNS timeout
+    timeout: 5
+  
+  # OSINT settings
+  osint:
+    # Enable OSINT gathering
+    enabled: true
+    
+    # Sources to use
+    sources:
+      - theharvester
+      - whois
+      - shodan  # Requires API key
+
+# Vulnerability scanner settings
+vulnerability_scanner:
+  # Nuclei settings
+  nuclei:
+    # Templates directory
+    templates_dir: "/usr/share/nuclei-templates"
+    
+    # Severity levels to include
+    severity:
+      - medium
+      - high
+      - critical
+    
+    # Rate limiting for nuclei
+    rate_limit: 150
+  
+  # Nmap settings
+  nmap:
+    # Default scan type
+    scan_type: "-sS -sV"
+    
+    # Top ports to scan
+    top_ports: 1000
+    
+    # Enable OS detection
+    os_detection: true
+    
+    # Enable script scanning
+    script_scan: true
+
+# Web scanner settings
+web_scanner:
+  # XSS testing
+  xss:
+    enabled: true
+    payloads_file: null  # Use built-in payloads
+  
+  # SQL injection testing
+  sqli:
+    enabled: true
+    payloads_file: null  # Use built-in payloads
+  
+  # Command injection testing
+  command_injection:
+    enabled: true
+    payloads_file: null  # Use built-in payloads
+  
+  # File inclusion testing
+  file_inclusion:
+    enabled: true
+    payloads_file: null  # Use built-in payloads
+  
+  # Directory enumeration
+  directory_enum:
+    enabled: true
+    wordlist: "/usr/share/wordlists/dirb/common.txt"
+    extensions:
+      - php
+      - asp
+      - aspx
+      - jsp
+      - html
+      - txt
+      - bak
+
+# Fuzzer settings
+fuzzer:
+  # Web fuzzing
+  web:
+    # Default wordlist for directory fuzzing
+    wordlist: "/usr/share/wordlists/dirb/common.txt"
+    
+    # Maximum fuzzing depth
+    max_depth: 3
+    
+    # Extensions to test
+    extensions:
+      - php
+      - asp
+      - aspx
+      - jsp
+      - html
+      - txt
+      - bak
+      - old
+      - backup
+  
+  # Parameter fuzzing
+  parameters:
+    # Common parameter names to test
+    common_params:
+      - id
+      - user
+      - username
+      - password
+      - email
+      - search
+      - q
+      - query
+      - page
+      - limit
+      - offset
+      - sort
+      - order
+      - filter
+      - category
+      - type
+      - action
+      - cmd
+      - command
+      - file
+      - path
+      - url
+      - redirect
+      - return
+      - callback
+      - debug
+      - test
+      - admin
+      - token
+      - session
+      - key
+      - api_key
+      - access_token
+      - csrf_token
+
+# Exploits module settings
+exploits:
+  # Payload generation
+  payloads:
+    # Enable payload generation
+    enabled: true
+    
+    # Output encoding options
+    encodings:
+      - url
+      - html
+      - base64
+      - hex
+  
+  # Reverse shell settings
+  reverse_shells:
+    # Default LHOST (will be prompted if not set)
+    lhost: null
+    
+    # Default LPORT
+    lport: 4444
+    
+    # Shell types to generate
+    types:
+      - bash
+      - python
+      - php
+      - powershell
+      - netcat
+
+# Reporting settings
+reporting:
+  # Default report format
+  format: "html"
+  
+  # Include screenshots (if applicable)
+  screenshots: true
+  
+  # Report templates
+  templates:
+    # Executive summary template
+    executive: "default"
+    
+    # Technical report template
+    technical: "default"
+  
+  # Risk scoring
+  risk_scoring:
+    # Risk matrix
+    critical: 10
+    high: 8
+    medium: 5
+    low: 2
+    info: 1
+
+# API keys and credentials (optional)
+api_keys:
+  # Shodan API key
+  # shodan: "your_shodan_api_key_here"
+  
+  # Censys API credentials
+  # censys:
+  #   api_id: "your_censys_api_id"
+  #   api_secret: "your_censys_api_secret"
+  
+  # VirusTotal API key
+  # virustotal: "your_virustotal_api_key"
+
+# Logging settings
+logging:
+  # Log level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+  level: "INFO"
+  
+  # Log file location
+  file: "./logs/openmanus.log"
+  
+  # Enable colored output
+  colored: true
+  
+  # Log format
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+# Target-specific settings (optional)
+targets:
+  # Example target-specific configuration
+  # example.com:
+  #   threads: 5
+  #   timeout: 60
+  #   passive_only: true
+  #   exclude_modules:
+  #     - fuzzer
+  #     - exploits
+
+# Module exclusions (global)
+exclude_modules: []
+  # - fuzzer
+  # - exploits
+
+# Advanced settings
+advanced:
+  # Enable experimental features
+  experimental: false
+  
+  # Custom tool paths
+  tool_paths: {}
+    # nmap: "/usr/bin/nmap"
+    # nuclei: "/usr/bin/nuclei"
+  
+  # Performance tuning
+  performance:
+    # Maximum concurrent connections
+    max_connections: 100
+    
+    # Connection pool size
+    pool_size: 20
+    
+    # Keep-alive timeout
+    keep_alive: 30
