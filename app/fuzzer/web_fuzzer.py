@@ -29,9 +29,14 @@ class WebFuzzer:
         self.session.verify = False
         self.session.timeout = 10
         
-    async def comprehensive_fuzz(self) -> Dict[str, Any]:
+    async def comprehensive_fuzz(self, max_depth: int = 3, delay: float = 0.5, threads: int = 10) -> Dict[str, Any]:
         """Run comprehensive fuzzing assessment"""
-        logger.info(f"Starting comprehensive fuzzing for {self.target_url}")
+        logger.info(f"Starting comprehensive fuzzing for {self.target_url} (depth={max_depth}, delay={delay}s, threads={threads})")
+        
+        # Store configuration for use in fuzzing methods
+        self.max_depth = max_depth
+        self.delay = delay
+        self.threads = threads
         
         fuzz_results = {
             'target': self.target_url,

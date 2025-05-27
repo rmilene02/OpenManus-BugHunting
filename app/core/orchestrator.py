@@ -16,7 +16,7 @@ from datetime import datetime
 from app.logger import logger
 from app.core.ai_tool_selector import AIToolSelector, ScanContext
 from app.reconnaissance.ai_recon_engine import AIReconEngine
-from app.scanner.web_scanner import WebScanner
+from app.scanner.web_scanner import WebVulnerabilityScanner
 from app.fuzzer.web_fuzzer import WebFuzzer
 from app.exploits.payload_generator import PayloadGenerator
 from app.reporting.report_generator import ReportGenerator
@@ -198,7 +198,7 @@ class SecurityOrchestrator:
         logger.info("Starting web application assessment")
         
         # Initialize web scanner
-        self.web_scanner = WebScanner(target)
+        self.web_scanner = WebVulnerabilityScanner(target)
         
         # Configure scanner based on AI recommendations
         scan_config = {
@@ -452,21 +452,9 @@ Respond in JSON format with detailed analysis.
         # Generate reports
         report_results = {}
         
-        if report_format in ['html', 'all']:
-            html_report = await self.report_generator.generate_html_report(report_data, output_dir)
-            report_results['html'] = html_report
-        
-        if report_format in ['json', 'all']:
-            json_report = await self.report_generator.generate_json_report(report_data, output_dir)
-            report_results['json'] = json_report
-        
-        if report_format in ['csv', 'all']:
-            csv_report = await self.report_generator.generate_csv_report(report_data, output_dir)
-            report_results['csv'] = csv_report
-        
-        if report_format in ['markdown', 'all']:
-            md_report = await self.report_generator.generate_markdown_report(report_data, output_dir)
-            report_results['markdown'] = md_report
+        # Generate comprehensive report (handles all formats internally)
+        report_path = self.report_generator.generate_comprehensive_report(report_data, assessment['target'], report_format)
+        report_results[report_format] = report_path
         
         logger.info("Report generation completed")
         return report_results

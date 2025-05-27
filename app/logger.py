@@ -26,6 +26,11 @@ def define_log_level(print_level="INFO", logfile_level="DEBUG", name: str = None
     return _logger
 
 
+def setup_logging(level="INFO", name=None):
+    """Setup logging configuration - alias for define_log_level"""
+    return define_log_level(print_level=level, name=name)
+
+
 logger = define_log_level()
 
 

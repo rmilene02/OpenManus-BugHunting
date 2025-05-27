@@ -12,6 +12,7 @@ Comprehensive reporting system for security assessments that generates:
 import json
 import csv
 import datetime
+import re
 from typing import Dict, List, Optional, Any
 from pathlib import Path
 import jinja2
@@ -39,6 +40,14 @@ class ReportGenerator:
             'low': {'score': 2, 'color': '#28a745'},
             'info': {'score': 1, 'color': '#17a2b8'}
         }
+    
+    def _sanitize_filename(self, target: str) -> str:
+        """Sanitize target URL for use in filename"""
+        # Remove protocol and replace invalid characters
+        sanitized = re.sub(r'^https?://', '', target)
+        sanitized = re.sub(r'[<>:"/\\|?*]', '_', sanitized)
+        sanitized = re.sub(r'[^\w\-_.]', '_', sanitized)
+        return sanitized
     
     def generate_comprehensive_report(self, assessment_data: Dict[str, Any], 
                                     target: str, format_type: str = 'html') -> str:
@@ -374,7 +383,8 @@ class ReportGenerator:
         html_content = template.render(data=processed_data, risk_matrix=self.risk_matrix)
         
         # Save to file
-        filename = f"security_report_{processed_data['target']}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+        sanitized_target = self._sanitize_filename(processed_data['target'])
+        filename = f"security_report_{sanitized_target}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
         filepath = self.output_dir / filename
         
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -385,7 +395,8 @@ class ReportGenerator:
     
     def _generate_json_report(self, processed_data: Dict[str, Any]) -> str:
         """Generate JSON report"""
-        filename = f"security_report_{processed_data['target']}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        sanitized_target = self._sanitize_filename(processed_data['target'])
+        filename = f"security_report_{sanitized_target}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         filepath = self.output_dir / filename
         
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -419,7 +430,8 @@ class ReportGenerator:
         template = self.jinja_env.get_template('markdown_report')
         markdown_content = template.render(data=processed_data)
         
-        filename = f"security_report_{processed_data['target']}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
+        sanitized_target = self._sanitize_filename(processed_data['target'])
+        filename = f"security_report_{sanitized_target}_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}.md"
         filepath = self.output_dir / filename
         
         with open(filepath, 'w', encoding='utf-8') as f:

@@ -1,0 +1,764 @@
+{
+  "target": "https://x.com",
+  "scan_mode": "comprehensive",
+  "config": {
+    "passive_only": false,
+    "deep_scan": false,
+    "stealth_mode": false,
+    "time_constraint": "normal",
+    "output_dir": "./results",
+    "report_format": "html"
+  },
+  "start_time": "2025-05-27T19:30:13.430623",
+  "modules_executed": [
+    "reconnaissance",
+    "web_assessment",
+    "fuzzing",
+    "vulnerability_analysis"
+  ],
+  "results": {
+    "reconnaissance": {
+      "target": "https://x.com",
+      "scan_context": {
+        "target_type": "url",
+        "scan_mode": "reconnaissance",
+        "passive_only": false,
+        "deep_scan": false,
+        "stealth_mode": false,
+        "time_constraint": "normal"
+      },
+      "ai_tool_selection": {
+        "subdomain_enumeration": [],
+        "web_discovery": [
+          "httpx"
+        ],
+        "network_scanning": [],
+        "vulnerability_scanning": [],
+        "directory_enumeration": [],
+        "osint": []
+      },
+      "execution_results": {
+        "web_discovery": {
+          "category": "web_discovery",
+          "tools_executed": [
+            "httpx"
+          ],
+          "tool_results": {
+            "httpx": {
+              "tool": "httpx",
+              "success": false,
+              "error": "Usage: httpx [OPTIONS] URL\n\nError: No such option: -l\n"
+            }
+          },
+          "aggregated_data": {
+            "category": "web_discovery",
+            "successful_tools": 0,
+            "failed_tools": 1,
+            "total_items": 0,
+            "live_hosts": [],
+            "technologies": []
+          },
+          "execution_time": 0.18403212701377925
+        }
+      },
+      "aggregated_results": {
+        "total_subdomains": 0,
+        "total_live_hosts": 0,
+        "total_vulnerabilities": 0,
+        "total_directories": 0,
+        "total_emails": 0,
+        "technologies_detected": [],
+        "open_ports": [],
+        "summary_by_category": {
+          "web_discovery": {
+            "category": "web_discovery",
+            "successful_tools": 0,
+            "failed_tools": 1,
+            "total_items": 0,
+            "live_hosts": [],
+            "technologies": []
+          }
+        }
+      },
+      "ai_analysis": {},
+      "summary": {
+        "target": "https://x.com",
+        "scan_completed": true,
+        "total_tools_used": 1,
+        "successful_tools": 0,
+        "failed_tools": 1,
+        "key_metrics": {
+          "subdomains_found": 0,
+          "live_hosts_found": 0,
+          "vulnerabilities_found": 0,
+          "technologies_detected": 0
+        },
+        "recommendations": []
+      }
+    },
+    "web_assessment": {
+      "target": "https://x.com",
+      "technology_detection": {
+        "whatweb": {
+          "error": "whatweb not available"
+        },
+        "custom_detection": {
+          "technologies": [
+            "Angular"
+          ],
+          "status_code": 400,
+          "content_length": 2540
+        },
+        "headers": {
+          "Date": "Tue, 27 May 2025 19:30:13 GMT",
+          "Content-Type": "text/html; charset=utf-8",
+          "Transfer-Encoding": "chunked",
+          "Connection": "keep-alive",
+          "perf": "7402827104",
+          "expiry": "Tue, 31 Mar 1981 05:00:00 GMT",
+          "pragma": "no-cache",
+          "Set-Cookie": "guest_id=v1%3A174837421378683588; Max-Age=34214400; Expires=Sat, 27 Jun 2026 19:30:13 GMT; Path=/; Domain=.x.com; Secure; SameSite=None, ct0=; Max-Age=-1748374212; Expires=Thu, 01 Jan 1970 00:00:01 GMT; Path=/; Domain=.x.com; Secure; SameSite=Lax, __cf_bm=K0Ler_tG9I.mWlLMdvIGnekSS8zZyGHNlyek_xgOFPE-1748374213-1.0.1.1-6ebEo0_XcyPC4ff2_52dspEpnGEsOMvKWTc57B3OOljEiQ.AefLTUd70JHZM8x5rSpPreAZnFaCyX3dQfVxJ8oNUyKg2VZENY.M5DJIclLw; path=/; expires=Tue, 27-May-25 20:00:13 GMT; domain=.x.com; HttpOnly; Secure; SameSite=None",
+          "x-powered-by": "Express",
+          "Cache-Control": "no-cache, no-store, must-revalidate, pre-check=0, post-check=0",
+          "last-modified": "Tue, 27 May 2025 19:30:13 GMT",
+          "x-frame-options": "DENY",
+          "x-transaction-id": "61abfbb2398ecbc1",
+          "x-xss-protection": "0",
+          "reporting-endpoints": "coep-report=\"https://x.com/i/coep-report\", coop-report=\"https://x.com/i/coop-report\"",
+          "x-content-type-options": "nosniff",
+          "content-security-policy": "connect-src 'self' blob: https://fonts.googleapis.com/css https://mapsresources-pa.googleapis.com https://maps.googleapis.com https://www.gstatic.com/maps/ https://*.pscp.tv https://*.twimg.com https://*.video.pscp.tv https://aa.twitter.com https://aa.x.com https://accounts.google.com/gsi/ https://ads-api.twitter.com https://ads-api.x.com https://api-stream.twitter.com https://api-stream.x.com https://api.twitter.com https://api.x.ai https://api.x.com https://api.x.com https://caps.twitter.com https://caps.x.com https://grok.x.com https://jf.twitter.com https://jf.x.com https://jf-t.x.com https://pay.twitter.com https://pay.x.com https://sentry.io https://ton-staging.atla.twitter.com https://ton-staging.atla.x.com https://ton-staging.pdxa.twitter.com https://ton-staging.pdxa.x.com https://ton.twitter.com https://ton.x.com https://twitter.com https://upload.twitter.com https://upload.x.com https://www.google-analytics.com https://x.com https://*.adtrafficquality.google https://*.googlesyndication.com https://*.doubleclick.net https://adservice.google.com https://www.googleadservices.com https://pagead2.googlesyndication.com https://www.google.com https://google.com https://via.intercom.io https://api.intercom.io https://api.au.intercom.io https://api.eu.intercom.io https://api-iam.intercom.io https://api-iam.eu.intercom.io https://api-iam.au.intercom.io https://api-ping.intercom.io https://nexus-websocket-a.intercom.io wss://nexus-websocket-a.intercom.io https://nexus-websocket-b.intercom.io wss://nexus-websocket-b.intercom.io https://nexus-europe-websocket.intercom.io wss://nexus-europe-websocket.intercom.io https://nexus-australia-websocket.intercom.io wss://nexus-australia-websocket.intercom.io https://uploads.intercomcdn.com https://uploads.intercomcdn.eu https://uploads.au.intercomcdn.com https://uploads.eu.intercomcdn.com https://uploads.intercomusercontent.com https://production.plaid.com/ https://sandbox.plaid.com/ https://ingestion.dv.socure.io https://network.dv.socure.io/ https://analytics.dv.socure.io/ https://payments-dev.x.com/customer/wasm/forward-with-v1.wasm https://payments-staging.x.com/customer/wasm/forward-with-v1.wasm https://payments-prod.x.com/customer/wasm/forward-with-v1.wasm https://money-dev.x.com/customer/wasm/forward-with-v1.wasm https://money-staging.x.com/customer/wasm/forward-with-v1.wasm https://money.x.com/customer/wasm/forward-with-v1.wasm https://api.stripe.com https://checkoutshopper-live.adyen.com wss://*.pscp.tv https://vmap.snappytv.com https://vmapstage.snappytv.com https://vmaprel.snappytv.com https://vmap.grabyo.com https://dhdsnappytv-vh.akamaihd.net https://pdhdsnappytv-vh.akamaihd.net https://mdhdsnappytv-vh.akamaihd.net https://mdhdsnappytv-vh.akamaihd.net https://mpdhdsnappytv-vh.akamaihd.net https://mmdhdsnappytv-vh.akamaihd.net https://mdhdsnappytv-vh.akamaihd.net https://mpdhdsnappytv-vh.akamaihd.net https://mmdhdsnappytv-vh.akamaihd.net https://dwo3ckksxlb0v.cloudfront.net https://media.riffsy.com https://*.giphy.com https://media.tenor.com https://c.tenor.com wss://chat-ws.x.com https://d1muhwhmpsz4u8.cloudfront.net/ https://d2bchqfeno8n2m.cloudfront.net/ https://d2shtph9y6bxk.cloudfront.net/ https://xchat-hsm-staging.x.com/ https://realm-a.x.com https://realm-b.x.com https://realm-west1.x.com https://realm-east1.x.com https://hsm-staging.x.com https://ads-twitter.com https://analytics.twitter.com https://analytics.x.com         ; default-src 'self'; form-action 'self' https://twitter.com https://*.twitter.com https://x.com https://*.x.com https://localhost.twitter.com:3443 https://localhost.x.com:3443 https://intercom.help https://api-iam.intercom.io https://api-iam.eu.intercom.io https://api-iam.au.intercom.io; font-src 'self' https://*.twimg.com https://js.intercomcdn.com https://fonts.intercomcdn.com; frame-src 'self' https://accounts.google.com/ https://accounts.google.com/gsi/ https://cards-frame.twitter.com https://cdn.plaid.com/ https://client-api.arkoselabs.com/ https://content.googleapis.com/ https://iframe.arkoselabs.com/ https://mobile.twitter.com https://mobile.x.com https://pay.twitter.com https://pay.x.com https://google.com https://www.google.com https://intercom-sheets.com https://www.intercom-reporting.com https://www.youtube.com https://player.vimeo.com https://fast.wistia.net https://console.googletagservices.com https://*.doubleclick.net https://*.adtrafficquality.google https://*.safeframe.googlesyndication.com https://www.googleadservices.com https://googleadservices.com https://adservice.google.com https://*.googlesyndication.com https://td.doubleclick.net https://payments-dev.x.com/ https://payments-staging.x.com/ https://payments-prod.x.com/ https://sdn.payments-dev.x.com/ https://sdn.payments-staging.x.com/ https://sdn.payments-prod.x.com/ https://money-dev.x.com/ https://money-staging.x.com/ https://money.x.com/ https://sdn.money-dev.x.com/ https://sdn.money-staging.x.com/ https://sdn.money.x.com/ https://p2pcreditcardiframesandbox.crbcos.com https://p2pcreditcardiframe.crbcos.com https://verify-sandbox.plaid.com/ https://*.js.stripe.com https://js.stripe.com https://hooks.stripe.com https://twitter.com https://x.com  https://recaptcha.net/recaptcha/; img-src 'self' blob: data: https://www.google.com/maps/place/ https://*.cdn.twitter.com https://*.cdn.x.com https://ton.twitter.com https://ton.x.com https://*.twimg.com https://analytics.twitter.com https://analytics.x.com https://cm.g.doubleclick.net https://www.google-analytics.com https://maps.googleapis.com https://www.periscope.tv https://www.pscp.tv https://ads-twitter.com https://ads-api.twitter.com https://ads-api.x.com https://api.x.com blob: data: https://js.intercomcdn.com https://static.intercomassets.com https://downloads.intercomcdn.com https://downloads.intercomcdn.eu https://downloads.au.intercomcdn.com https://uploads.intercomusercontent.com https://gifs.intercomcdn.com https://video-messages.intercomcdn.com https://messenger-apps.intercom.io https://messenger-apps.eu.intercom.io https://messenger-apps.au.intercom.io https://*.intercom-attachments-1.com https://*.intercom-attachments.eu https://*.au.intercom-attachments.com https://*.intercom-attachments-2.com https://*.intercom-attachments-3.com https://*.intercom-attachments-4.com https://*.intercom-attachments-5.com https://*.intercom-attachments-6.com https://*.intercom-attachments-7.com https://*.intercom-attachments-8.com https://*.intercom-attachments-9.com https://static.intercomassets.eu https://static.au.intercomassets.com https://media.riffsy.com https://*.giphy.com https://media.tenor.com https://c.tenor.com https://*.pscp.tv https://*.periscope.tv https://prod-periscope-profile.s3-us-west-2.amazonaws.com https://platform-lookaside.fbsbx.com https://scontent.xx.fbcdn.net https://scontent-sea1-1.xx.fbcdn.net https://*.googleusercontent.com https://t.co/1/i/adsct https://*.googleusercontent.com https://*.gstatic.com https://*.googlesyndication.com https://*.adtrafficquality.google https://www.google.com/ads/measurement/ https://*.google.com/ads/measurement/ https://googleads.g.doubleclick.net https://google.com https://www.google.com https://plaid-merchant-logos.plaid.com https://plaid-counterparty-logos.plaid.com; manifest-src 'self'; media-src 'self' data: blob: https://twitter.com https://x.com https://*.twimg.com https://*.vine.co https://*.pscp.tv https://*.video.pscp.tv https://js.intercomcdn.com https://downloads.intercomcdn.com https://downloads.intercomcdn.eu https://downloads.au.intercomcdn.com https://dhdsnappytv-vh.akamaihd.net https://pdhdsnappytv-vh.akamaihd.net https://mdhdsnappytv-vh.akamaihd.net https://mdhdsnappytv-vh.akamaihd.net https://mpdhdsnappytv-vh.akamaihd.net https://mmdhdsnappytv-vh.akamaihd.net https://mdhdsnappytv-vh.akamaihd.net https://mpdhdsnappytv-vh.akamaihd.net https://mmdhdsnappytv-vh.akamaihd.net https://dwo3ckksxlb0v.cloudfront.net; object-src 'none'; script-src 'self' 'unsafe-inline' https://maps.googleapis.com https://*.twimg.com https://recaptcha.net/recaptcha/ http://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js https://accounts.google.com/gsi/client https://apis.google.com/js/api.js https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js https://client-api.arkoselabs.com/ https://static.ads-twitter.com https://twitter.com https://www.google-analytics.com https://www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js https://x.com https://sdn.payments-dev.x.com/assets/loader.min.js https://sdn.payments-staging.x.com/assets/loader.min.js https://sdn.payments-prod.x.com/assets/loader.min.js https://sdn.money-dev.x.com/assets/loader.min.js https://sdn.money-staging.x.com/assets/loader.min.js https://sdn.money.x.com/assets/loader.min.js https://sdk.dv.socure.io/latest/device-risk-sdk.js https://cdn.plaid.com/link/v2/stable/link-initialize.js https://payments-dev.x.com/customer/wasm/xxp-forward-with-sdk.js https://payments-staging.x.com/customer/wasm/xxp-forward-with-sdk.js https://payments-prod.x.com/customer/wasm/xxp-forward-with-sdk.js https://money-dev.x.com/customer/wasm/xxp-forward-with-sdk.js https://money-staging.x.com/customer/wasm/xxp-forward-with-sdk.js https://money.x.com/customer/wasm/xxp-forward-with-sdk.js https://js.stripe.com https://*.js.stripe.com https://securepubads.g.doubleclick.net https://www.googletagservices.com https://*.googletagservices.com https://pagead2.googlesyndication.com https://adservice.google.com https://www.googleadservices.com https://ads.google.com https://tpc.googlesyndication.com https://*.tpc.googlesyndication.com https://www.google.com https://googleads.g.doubleclick.net https://app.intercom.io https://widget.intercom.io https://js.intercomcdn.com   'wasm-unsafe-eval'  'nonce-NWRhODc2YWEtODk4Yi00ZjA1LTk1YjAtN2Y4YWE1Mjc0ODIw'; style-src 'self' 'unsafe-inline' https://accounts.google.com/gsi/style https://*.twimg.com; worker-src 'self' blob:; report-uri https://x.com/i/csp_report?a=O5RXE%3D%3D%3D&ro=false",
+          "strict-transport-security": "max-age=631138519",
+          "cross-origin-opener-policy": "unsafe-none",
+          "cross-origin-embedder-policy": "unsafe-none",
+          "x-response-time": "10",
+          "x-connection-hash": "756cecbd0a4d54365f056d69a6dd58de062549425da7e9b8d9e9011c3b8c4d3e",
+          "vary": "accept-encoding",
+          "cf-cache-status": "DYNAMIC",
+          "Server": "cloudflare tsa_b",
+          "CF-RAY": "9467ecf40e87e26a-ORD"
+        },
+        "cookies": {
+          "guest_id": "v1%3A174837421378683588",
+          "__cf_bm": "K0Ler_tG9I.mWlLMdvIGnekSS8zZyGHNlyek_xgOFPE-1748374213-1.0.1.1-6ebEo0_XcyPC4ff2_52dspEpnGEsOMvKWTc57B3OOljEiQ.AefLTUd70JHZM8x5rSpPreAZnFaCyX3dQfVxJ8oNUyKg2VZENY.M5DJIclLw"
+        }
+      },
+      "directory_enumeration": {
+        "gobuster": {
+          "error": "gobuster not available"
+        },
+        "common_files": {
+          "found": [
+            {
+              "path": "robots.txt",
+              "url": "https://x.com/robots.txt",
+              "status_code": 200,
+              "content_length": "unknown"
+            }
+          ]
+        },
+        "admin_panels": {
+          "found": []
+        }
+      },
+      "vulnerability_scan": {
+        "error": "nikto not available"
+      },
+      "sql_injection_test": {
+        "sqlmap": {
+          "error": "sqlmap not available"
+        },
+        "manual_tests": {
+          "vulnerable_parameters": []
+        }
+      },
+      "waf_detection": {
+        "wafw00f": {},
+        "custom_detection": {
+          "detected_waf": [
+            "Cloudflare"
+          ],
+          "status_code": 403,
+          "blocked": true
+        }
+      },
+      "nuclei_scan": {
+        "error": "nuclei not available"
+      },
+      "custom_checks": {
+        "information_disclosure": [
+          {
+            "pattern": "error|Error|ERROR",
+            "description": "Error messages found",
+            "matches": [
+              "error",
+              "error",
+              "error",
+              "error",
+              "error"
+            ],
+            "severity": "low"
+          }
+        ],
+        "security_headers": {
+          "missing": [
+            {
+              "header": "X-Permitted-Cross-Domain-Policies",
+              "description": "Missing cross-domain policy",
+              "severity": "medium"
+            }
+          ],
+          "present": [
+            "X-Frame-Options",
+            "X-XSS-Protection",
+            "X-Content-Type-Options",
+            "Strict-Transport-Security",
+            "Content-Security-Policy"
+          ]
+        },
+        "ssl_tls_issues": [],
+        "authentication_issues": [],
+        "session_management": []
+      },
+      "summary": {
+        "total_vulnerabilities": 0,
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "info": 0
+      }
+    },
+    "fuzzing": {
+      "target": "https://x.com",
+      "directory_fuzzing": {
+        "gobuster": {
+          "error": "gobuster not available"
+        },
+        "wfuzz": {},
+        "ffuf": {},
+        "custom_fuzzing": {
+          "found_paths": [
+            {
+              "path": "admin",
+              "url": "https://x.com/admin",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "administrator",
+              "url": "https://x.com/administrator",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "api",
+              "url": "https://x.com/api",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "backup",
+              "url": "https://x.com/backup",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "config",
+              "url": "https://x.com/config",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "database",
+              "url": "https://x.com/database",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "dev",
+              "url": "https://x.com/dev",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "docs",
+              "url": "https://x.com/docs",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "files",
+              "url": "https://x.com/files",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "images",
+              "url": "https://x.com/images",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "includes",
+              "url": "https://x.com/includes",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "js",
+              "url": "https://x.com/js",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "css",
+              "url": "https://x.com/css",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "login",
+              "url": "https://x.com/login",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "panel",
+              "url": "https://x.com/panel",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "private",
+              "url": "https://x.com/private",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "public",
+              "url": "https://x.com/public",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "scripts",
+              "url": "https://x.com/scripts",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "secure",
+              "url": "https://x.com/secure",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "test",
+              "url": "https://x.com/test",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "tmp",
+              "url": "https://x.com/tmp",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "upload",
+              "url": "https://x.com/upload",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "uploads",
+              "url": "https://x.com/uploads",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "user",
+              "url": "https://x.com/user",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "users",
+              "url": "https://x.com/users",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": "www",
+              "url": "https://x.com/www",
+              "status_code": 403,
+              "content_length": "unknown"
+            },
+            {
+              "path": ".git",
+              "url": "https://x.com/.git",
+              "status_code": 403,
+              "content_length": "4507"
+            },
+            {
+              "path": ".svn",
+              "url": "https://x.com/.svn",
+              "status_code": 403,
+              "content_length": "4507"
+            },
+            {
+              "path": ".env",
+              "url": "https://x.com/.env",
+              "status_code": 403,
+              "content_length": "4507"
+            },
+            {
+              "path": ".htaccess",
+              "url": "https://x.com/.htaccess",
+              "status_code": 403,
+              "content_length": "4507"
+            },
+            {
+              "path": "web.config",
+              "url": "https://x.com/web.config",
+              "status_code": 403,
+              "content_length": "4507"
+            },
+            {
+              "path": "robots.txt",
+              "url": "https://x.com/robots.txt",
+              "status_code": 200,
+              "content_length": "unknown"
+            }
+          ]
+        }
+      },
+      "parameter_fuzzing": {
+        "get_parameters": {
+          "findings": [
+            {
+              "parameter": "id",
+              "url": "https://x.com?id=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "user",
+              "url": "https://x.com?user=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "username",
+              "url": "https://x.com?username=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "password",
+              "url": "https://x.com?password=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "email",
+              "url": "https://x.com?email=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "name",
+              "url": "https://x.com?name=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "search",
+              "url": "https://x.com?search=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "q",
+              "url": "https://x.com?q=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "query",
+              "url": "https://x.com?query=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "page",
+              "url": "https://x.com?page=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "limit",
+              "url": "https://x.com?limit=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "offset",
+              "url": "https://x.com?offset=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "sort",
+              "url": "https://x.com?sort=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "order",
+              "url": "https://x.com?order=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "filter",
+              "url": "https://x.com?filter=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "category",
+              "url": "https://x.com?category=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "type",
+              "url": "https://x.com?type=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "action",
+              "url": "https://x.com?action=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "cmd",
+              "url": "https://x.com?cmd=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "command",
+              "url": "https://x.com?command=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "file",
+              "url": "https://x.com?file=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "path",
+              "url": "https://x.com?path=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "url",
+              "url": "https://x.com?url=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "redirect",
+              "url": "https://x.com?redirect=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "return",
+              "url": "https://x.com?return=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "callback",
+              "url": "https://x.com?callback=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "debug",
+              "url": "https://x.com?debug=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "test",
+              "url": "https://x.com?test=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "admin",
+              "url": "https://x.com?admin=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "token",
+              "url": "https://x.com?token=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "session",
+              "url": "https://x.com?session=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "key",
+              "url": "https://x.com?key=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "api_key",
+              "url": "https://x.com?api_key=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "access_token",
+              "url": "https://x.com?access_token=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            },
+            {
+              "parameter": "csrf_token",
+              "url": "https://x.com?csrf_token=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 2540
+            }
+          ]
+        },
+        "post_parameters": {
+          "findings": []
+        },
+        "hidden_parameters": {}
+      },
+      "header_fuzzing": {
+        "custom_headers": {
+          "findings": []
+        },
+        "header_injection": {
+          "findings": []
+        }
+      },
+      "input_validation": {
+        "xss_testing": {},
+        "command_injection": {},
+        "path_traversal": {},
+        "ldap_injection": {}
+      },
+      "boundary_testing": {
+        "buffer_overflow": {},
+        "integer_overflow": {},
+        "large_inputs": {}
+      },
+      "injection_testing": {
+        "sql_injection": {},
+        "nosql_injection": {},
+        "xml_injection": {},
+        "ldap_injection": {}
+      },
+      "file_upload_testing": {
+        "upload_forms": {
+          "found": [],
+          "count": 0
+        },
+        "file_type_bypass": {},
+        "malicious_uploads": {}
+      },
+      "summary": {
+        "total_findings": 35,
+        "directories_found": 0,
+        "parameters_found": 0,
+        "vulnerabilities": 35
+      }
+    },
+    "vulnerability_analysis": {
+      "vulnerabilities": [],
+      "total_vulnerabilities": 0,
+      "risk_score": 0,
+      "risk_level": "Informational",
+      "vulnerability_categories": {}
+    },
+    "reporting": {
+      "html": "reports/security_report_x.com_20250527_193022.html"
+    }
+  },
+  "ai_decisions": {
+    "final_analysis": {
+      "error": "No LLM client available for AI analysis"
+    }
+  },
+  "summary": {
+    "target": "https://x.com",
+    "scan_mode": "comprehensive",
+    "modules_executed": [
+      "reconnaissance",
+      "web_assessment",
+      "fuzzing",
+      "vulnerability_analysis"
+    ],
+    "total_vulnerabilities": 0,
+    "risk_level": "Informational",
+    "key_findings": [],
+    "recommendations": [],
+    "execution_time": null
+  },
+  "status": "completed",
+  "end_time": "2025-05-27T19:30:22.613588"
+}

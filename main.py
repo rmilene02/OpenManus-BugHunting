@@ -26,7 +26,7 @@ sys.path.append(str(Path(__file__).parent / "app"))
 
 from app.core.orchestrator import SecurityOrchestrator
 from app.logger import setup_logging, logger
-from app.llm import LLMClient
+from app.llm import LLM
 
 
 def print_banner():
@@ -275,6 +275,14 @@ Examples:
     return parser.parse_args()
 
 
+def normalize_url(url: str) -> str:
+    """Normalize URL by adding scheme if missing"""
+    if not url.startswith(('http://', 'https://')):
+        # Try HTTPS first, fallback to HTTP if needed
+        return f"https://{url}"
+    return url
+
+
 def validate_arguments(args):
     """Validate command line arguments"""
     errors = []
@@ -407,11 +415,11 @@ async def main():
         # Prepare targets
         targets = []
         if args.target:
-            targets = [args.target]
+            targets = [normalize_url(args.target)]
         elif args.target_list:
             logger.info(f"📂 Loading targets from {args.target_list}")
             with open(args.target_list, 'r') as f:
-                targets = [line.strip() for line in f if line.strip() and not line.startswith('#')]
+                targets = [normalize_url(line.strip()) for line in f if line.strip() and not line.startswith('#')]
         
         if not targets:
             logger.error("❌ No targets specified")

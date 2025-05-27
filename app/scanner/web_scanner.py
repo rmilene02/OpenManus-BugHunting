@@ -62,7 +62,9 @@ class WebVulnerabilityScanner:
         self.vulnerabilities = []
         self.scan_results = {}
         
-    async def comprehensive_scan(self) -> Dict[str, Any]:
+    async def comprehensive_scan(self, test_xss: bool = True, test_sqli: bool = True, 
+                               test_lfi: bool = True, test_command_injection: bool = True, 
+                               stealth_mode: bool = False) -> Dict[str, Any]:
         """Run comprehensive web vulnerability assessment"""
         logger.info(f"Starting comprehensive web vulnerability scan for {self.target_url}")
         
