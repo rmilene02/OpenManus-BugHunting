@@ -45,7 +45,7 @@
 [llm]
 model = "deepseek-chat"
 base_url = "https://api.deepseek.com/v1"
-api_key = "sk-6dbb1f7739da4104a577b365c2ac2f39"
+api_key = ""
 max_tokens = 4096
 temperature = 0.3
 api_type = "openai"
