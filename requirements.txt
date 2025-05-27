@@ -82,5 +82,5 @@ sqlalchemy~=2.0.36
 
 # Development and testing
 mypy~=1.14.1
-black~=24.12.0
+black~=24.10.0
 flake8~=7.1.1
