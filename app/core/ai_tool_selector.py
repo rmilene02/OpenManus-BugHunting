@@ -357,14 +357,19 @@ Only select tools that are in the AVAILABLE TOOLS list above.
     async def _query_llm(self, prompt: str) -> str:
         """Query the LLM with the tool selection prompt"""
         # This would integrate with your LLM client
-        # For now, return a placeholder response
-        if hasattr(self.llm_client, 'chat') or hasattr(self.llm_client, 'complete'):
+        # Use the LLM client's ask_simple method for text prompts
+        if hasattr(self.llm_client, 'ask_simple'):
             try:
-                # Adapt this to your specific LLM client interface
-                if hasattr(self.llm_client, 'chat'):
-                    response = await self.llm_client.chat(prompt)
-                else:
-                    response = await self.llm_client.complete(prompt)
+                response = await self.llm_client.ask_simple(prompt)
+                return response
+            except Exception as e:
+                logger.error(f"LLM query failed: {e}")
+                raise
+        elif hasattr(self.llm_client, 'ask'):
+            try:
+                # Fallback to ask method with proper message format
+                messages = [{"role": "user", "content": prompt}]
+                response = await self.llm_client.ask(messages)
                 return response
             except Exception as e:
                 logger.error(f"LLM query failed: {e}")

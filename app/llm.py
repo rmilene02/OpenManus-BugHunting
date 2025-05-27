@@ -187,8 +187,14 @@ class LLM:
         self, config_name: str = "default", llm_config: Optional[LLMSettings] = None
     ):
         if not hasattr(self, "client"):  # Only initialize if not already initialized
-            llm_config = llm_config or config.llm
-            llm_config = llm_config.get(config_name, llm_config["default"])
+            if llm_config is None:
+                llm_config = config.llm
+                llm_config = llm_config.get(config_name, llm_config.get("default", {}))
+            else:
+                # If custom config is provided as dict, get the specific config
+                if isinstance(llm_config, dict):
+                    llm_config = llm_config.get(config_name, list(llm_config.values())[0] if llm_config else {})
+                # If it's already a LLMSettings object, use it directly
             self.model = llm_config.model
             self.max_tokens = llm_config.max_tokens
             self.temperature = llm_config.temperature
@@ -358,6 +364,20 @@ class LLM:
             (OpenAIError, Exception, ValueError)
         ),  # Don't retry TokenLimitExceeded
     )
+    async def ask_simple(self, prompt: str, temperature: Optional[float] = None) -> str:
+        """
+        Send a simple text prompt to the LLM and get the response.
+        
+        Args:
+            prompt (str): The text prompt to send
+            temperature (float): Sampling temperature for the response
+            
+        Returns:
+            str: The generated response
+        """
+        messages = [{"role": "user", "content": prompt}]
+        return await self.ask(messages, temperature=temperature)
+
     async def ask(
         self,
         messages: List[Union[dict, Message]],
