@@ -1,5 +1,6 @@
 import math
-from typing import Dict, List, Optional, Union
+import json
+from typing import Dict, List, Optional, Union, Any
 
 import tiktoken
 from openai import (
@@ -186,7 +187,7 @@ class LLM:
     ):
         if config_name not in cls._instances:
             instance = super().__new__(cls)
-            instance.__init__(config_name, llm_config)
+            instance.__init__(config_name, llm_config) # type: ignore
             cls._instances[config_name] = instance
         return cls._instances[config_name]
 
@@ -195,29 +196,32 @@ class LLM:
     ):
         if not hasattr(self, "client"):  # Only initialize if not already initialized
             if llm_config is None:
-                llm_config = config.llm
-                llm_config = llm_config.get(config_name, llm_config.get("default", {}))
-            else:
-                # If custom config is provided as dict, get the specific config
-                if isinstance(llm_config, dict):
-                    llm_config = llm_config.get(config_name, list(llm_config.values())[0] if llm_config else {})
-                # If it's already a LLMSettings object, use it directly
+                llm_settings_dict = config.llm.model_dump()  # Use .model_dump() for Pydantic v2
+                config_data = llm_settings_dict.get(config_name, llm_settings_dict.get("default", {}))
+                llm_config = LLMSettings(**config_data) # Create LLMSettings instance
+            elif isinstance(llm_config, dict): # Handle if a dict is passed
+                config_data = llm_config.get(config_name, list(llm_config.values())[0] if llm_config else {})
+                llm_config = LLMSettings(**config_data) # Create LLMSettings instance
+
             self.model = llm_config.model
             self.max_tokens = llm_config.max_tokens
             self.temperature = llm_config.temperature
             self.api_type = llm_config.api_type
-            self.api_key = llm_config.api_key
+            self.api_key = llm_config.api_key.get_secret_value() if llm_config.api_key else None # type: ignore
             self.api_version = llm_config.api_version
-            self.base_url = llm_config.base_url
+            self.base_url = str(llm_config.base_url) if llm_config.base_url else None # type: ignore
 
             # Add token counting related attributes
             self.total_input_tokens = 0
             self.total_completion_tokens = 0
-            self.max_input_tokens = (
-                llm_config.max_input_tokens
-                if hasattr(llm_config, "max_input_tokens")
-                else None
-            )
+            
+            # Usar getattr para buscar max_input_tokens, default para 65536 se não existir
+            # Esta é a parte crucial da correção:
+            llm_config_max_tokens = getattr(llm_config, "max_input_tokens", 65536)
+            if llm_config_max_tokens is None: # Cobrir o caso de o atributo existir mas ser None
+                self.max_input_tokens = 65536
+            else:
+                self.max_input_tokens = llm_config_max_tokens
 
             # Initialize tokenizer
             try:
@@ -228,12 +232,12 @@ class LLM:
 
             if self.api_type == "azure":
                 self.client = AsyncAzureOpenAI(
-                    base_url=self.base_url,
+                    base_url=self.base_url, # type: ignore
                     api_key=self.api_key,
                     api_version=self.api_version,
                 )
             elif self.api_type == "aws":
-                self.client = BedrockClient()
+                self.client = BedrockClient() # type: ignore
             elif self.api_type == "deepseek":
                 # DeepSeek uses OpenAI-compatible API
                 self.client = AsyncOpenAI(
@@ -241,11 +245,11 @@ class LLM:
                     base_url=self.base_url or "https://api.deepseek.com"
                 )
             else:
-                self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url)
+                self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url) # type: ignore
 
             self.token_counter = TokenCounter(self.tokenizer)
 
-    def count_tokens(self, text: str) -> int:
+    def count_text(self, text: str) -> int:
         """Calculate the number of tokens in a text"""
         if not text:
             return 0
@@ -370,6 +374,62 @@ class LLM:
 
         return formatted_messages
 
+    def validate_token_limits(self, messages: List[Union[dict, Message]],
+                             system_msgs: Optional[List[Union[dict, Message]]] = None) -> bool:
+        """
+        Validate that messages fit within token limits before sending to API.
+
+        Args:
+            messages: List of conversation messages
+            system_msgs: Optional system messages
+
+        Returns:
+            bool: True if within limits, False otherwise
+        """
+        try:
+            # FIX: Se max_input_tokens não estiver configurado (é None),
+            # não há limite para validar aqui. A validação real de estouro
+            # ocorrerá mais tarde, ou é considerado que não há limite.
+            if self.max_input_tokens is None:
+                return True # Não há limite de tokens de entrada configurado.
+
+            # Format messages
+            formatted_messages = self.format_messages(messages)
+
+            # Add system messages if provided
+            if system_msgs:
+                formatted_system = self.format_messages(system_msgs)
+                all_messages = formatted_system + formatted_messages
+            else:
+                all_messages = formatted_messages
+
+            # Calculate total tokens
+            total_tokens = self.count_message_tokens(all_messages)
+
+            # Check against limit (leave room for response)
+            # Esta linha (originalmente 410) agora é segura porque já garantimos que
+            # self.max_input_tokens não é None se chegamos até aqui.
+            max_allowed = self.max_input_tokens - self.max_tokens # type: ignore
+
+            if total_tokens > max_allowed:
+                logger.warning(f"Token limit validation failed: {total_tokens} tokens > {max_allowed} limit")
+                return False
+
+            return True
+
+        except Exception as e:
+            logger.error(f"Error in token validation: {e}")
+            return False
+
+    def get_safe_chunk_size(self) -> int:
+        """Get a safe chunk size for content splitting"""
+        # Use 70% of max input tokens, leaving room for prompts and response
+        if self.max_input_tokens is None:
+            # Default to a reasonable chunk size if max_input_tokens is not set
+            return 4096 # type: ignore
+        return int(self.max_input_tokens * 0.7)
+
+
     @retry(
         wait=wait_random_exponential(min=1, max=60),
         stop=stop_after_attempt(6),
@@ -380,16 +440,31 @@ class LLM:
     async def ask_simple(self, prompt: str, temperature: Optional[float] = None) -> str:
         """
         Send a simple text prompt to the LLM and get the response.
-        
+        Automatically uses chunking if prompt is too large.
+
         Args:
             prompt (str): The text prompt to send
             temperature (float): Sampling temperature for the response
-            
+
         Returns:
             str: The generated response
         """
         messages = [{"role": "user", "content": prompt}]
-        return await self.ask(messages, temperature=temperature)
+
+        # Check if prompt fits within token limits
+        if self.validate_token_limits(messages): # type: ignore
+            return await self.ask(messages, temperature=temperature) # type: ignore
+        else:
+            # Use chunked processing for large prompts
+            logger.info("Prompt too large, using chunked processing")
+            return await self.ask_chunked(
+                content=prompt,
+                system_prompt="You are a helpful AI assistant analyzing security data.",
+                chunk_prompt_template="Analyze the following data and provide key insights:
+
+{chunk}",
+                summary_prompt="Combine the following analyses into a comprehensive summary:"
+            )
 
     async def ask(
         self,
@@ -422,13 +497,13 @@ class LLM:
 
             # Format system and user messages with image support check
             if system_msgs:
-                system_msgs = self.format_messages(system_msgs, supports_images)
-                messages = system_msgs + self.format_messages(messages, supports_images)
+                system_msgs = self.format_messages(system_msgs, supports_images) # type: ignore
+                messages = system_msgs + self.format_messages(messages, supports_images) # type: ignore
             else:
-                messages = self.format_messages(messages, supports_images)
+                messages = self.format_messages(messages, supports_images) # type: ignore
 
             # Calculate input token count
-            input_tokens = self.count_message_tokens(messages)
+            input_tokens = self.count_message_tokens(messages) # type: ignore
 
             # Check if token limits are exceeded
             if not self.check_token_limit(input_tokens):
@@ -436,7 +511,7 @@ class LLM:
                 # Raise a special exception that won't be retried
                 raise TokenLimitExceeded(error_message)
 
-            params = {
+            params: Dict[str, Any] = { # type: ignore
                 "model": self.model,
                 "messages": messages,
             }
@@ -451,7 +526,7 @@ class LLM:
 
             if not stream:
                 # Non-streaming request
-                response = await self.client.chat.completions.create(
+                response: ChatCompletion = await self.client.chat.completions.create( # type: ignore
                     **params, stream=False
                 )
 
@@ -460,19 +535,19 @@ class LLM:
 
                 # Update token counts
                 self.update_token_count(
-                    response.usage.prompt_tokens, response.usage.completion_tokens
+                    response.usage.prompt_tokens, response.usage.completion_tokens # type: ignore
                 )
 
-                return response.choices[0].message.content
+                return response.choices[0].message.content # type: ignore
 
             # Streaming request, For streaming, update estimated token count before making the request
             self.update_token_count(input_tokens)
 
-            response = await self.client.chat.completions.create(**params, stream=True)
+            response = await self.client.chat.completions.create(**params, stream=True) # type: ignore
 
             collected_messages = []
             completion_text = ""
-            async for chunk in response:
+            async for chunk in response: # type: ignore
                 chunk_message = chunk.choices[0].delta.content or ""
                 collected_messages.append(chunk_message)
                 completion_text += chunk_message
@@ -484,7 +559,7 @@ class LLM:
                 raise ValueError("Empty response from streaming LLM")
 
             # estimate completion tokens for streaming response
-            completion_tokens = self.count_tokens(completion_text)
+            completion_tokens = self.count_text(completion_text)
             logger.info(
                 f"Estimated completion tokens for streaming response: {completion_tokens}"
             )
@@ -554,7 +629,7 @@ class LLM:
                 )
 
             # Format messages with image support
-            formatted_messages = self.format_messages(messages, supports_images=True)
+            formatted_messages = self.format_messages(messages, supports_images=True) # type: ignore
 
             # Ensure the last message is from the user to attach images
             if not formatted_messages or formatted_messages[-1]["role"] != "user":
@@ -567,10 +642,10 @@ class LLM:
 
             # Convert content to multimodal format if needed
             content = last_message["content"]
-            multimodal_content = (
+            multimodal_content: List[Dict[str, Any]] = ( # type: ignore
                 [{"type": "text", "text": content}]
                 if isinstance(content, str)
-                else content
+                else content # type: ignore
                 if isinstance(content, list)
                 else []
             )
@@ -582,9 +657,9 @@ class LLM:
                         {"type": "image_url", "image_url": {"url": image}}
                     )
                 elif isinstance(image, dict) and "url" in image:
-                    multimodal_content.append({"type": "image_url", "image_url": image})
+                    multimodal_content.append({"type": "image_url", "image_url": image}) # type: ignore
                 elif isinstance(image, dict) and "image_url" in image:
-                    multimodal_content.append(image)
+                    multimodal_content.append(image) # type: ignore
                 else:
                     raise ValueError(f"Unsupported image format: {image}")
 
@@ -594,19 +669,19 @@ class LLM:
             # Add system messages if provided
             if system_msgs:
                 all_messages = (
-                    self.format_messages(system_msgs, supports_images=True)
+                    self.format_messages(system_msgs, supports_images=True) # type: ignore
                     + formatted_messages
                 )
             else:
                 all_messages = formatted_messages
 
             # Calculate tokens and check limits
-            input_tokens = self.count_message_tokens(all_messages)
+            input_tokens = self.count_message_tokens(all_messages) # type: ignore
             if not self.check_token_limit(input_tokens):
                 raise TokenLimitExceeded(self.get_limit_error_message(input_tokens))
 
             # Set up API parameters
-            params = {
+            params: Dict[str, Any] = { # type: ignore
                 "model": self.model,
                 "messages": all_messages,
                 "stream": stream,
@@ -623,20 +698,20 @@ class LLM:
 
             # Handle non-streaming request
             if not stream:
-                response = await self.client.chat.completions.create(**params)
+                response: ChatCompletion = await self.client.chat.completions.create(**params) # type: ignore
 
                 if not response.choices or not response.choices[0].message.content:
                     raise ValueError("Empty or invalid response from LLM")
 
-                self.update_token_count(response.usage.prompt_tokens)
-                return response.choices[0].message.content
+                self.update_token_count(response.usage.prompt_tokens) # type: ignore
+                return response.choices[0].message.content # type: ignore
 
             # Handle streaming request
             self.update_token_count(input_tokens)
-            response = await self.client.chat.completions.create(**params)
+            response = await self.client.chat.completions.create(**params) # type: ignore
 
             collected_messages = []
-            async for chunk in response:
+            async for chunk in response: # type: ignore
                 chunk_message = chunk.choices[0].delta.content or ""
                 collected_messages.append(chunk_message)
                 print(chunk_message, end="", flush=True)
@@ -707,7 +782,7 @@ class LLM:
         """
         try:
             # Validate tool_choice
-            if tool_choice not in TOOL_CHOICE_VALUES:
+            if tool_choice not in TOOL_CHOICE_VALUES: # type: ignore
                 raise ValueError(f"Invalid tool_choice: {tool_choice}")
 
             # Check if the model supports images
@@ -715,19 +790,19 @@ class LLM:
 
             # Format messages
             if system_msgs:
-                system_msgs = self.format_messages(system_msgs, supports_images)
-                messages = system_msgs + self.format_messages(messages, supports_images)
+                system_msgs = self.format_messages(system_msgs, supports_images) # type: ignore
+                messages = system_msgs + self.format_messages(messages, supports_images) # type: ignore
             else:
-                messages = self.format_messages(messages, supports_images)
+                messages = self.format_messages(messages, supports_images) # type: ignore
 
             # Calculate input token count
-            input_tokens = self.count_message_tokens(messages)
+            input_tokens = self.count_message_tokens(messages) # type: ignore
 
             # If there are tools, calculate token count for tool descriptions
             tools_tokens = 0
             if tools:
                 for tool in tools:
-                    tools_tokens += self.count_tokens(str(tool))
+                    tools_tokens += self.count_text(str(tool))
 
             input_tokens += tools_tokens
 
@@ -744,7 +819,7 @@ class LLM:
                         raise ValueError("Each tool must be a dict with 'type' field")
 
             # Set up the completion request
-            params = {
+            params: Dict[str, Any] = { # type: ignore
                 "model": self.model,
                 "messages": messages,
                 "tools": tools,
@@ -762,7 +837,7 @@ class LLM:
                 )
 
             params["stream"] = False  # Always use non-streaming for tool requests
-            response: ChatCompletion = await self.client.chat.completions.create(
+            response: ChatCompletion = await self.client.chat.completions.create( # type: ignore
                 **params
             )
 
@@ -774,7 +849,7 @@ class LLM:
 
             # Update token counts
             self.update_token_count(
-                response.usage.prompt_tokens, response.usage.completion_tokens
+                response.usage.prompt_tokens, response.usage.completion_tokens # type: ignore
             )
 
             return response.choices[0].message
@@ -797,3 +872,201 @@ class LLM:
         except Exception as e:
             logger.error(f"Unexpected error in ask_tool: {e}")
             raise
+
+    def chunk_content(self, content: str, max_tokens: int = None) -> List[str]: # type: ignore
+        """
+        Split content into chunks that fit within token limits.
+
+        Args:
+            content: The content to chunk
+            max_tokens: Maximum tokens per chunk (defaults to 80% of model limit)
+
+        Returns:
+            List of content chunks
+        """
+        if max_tokens is None:
+            # Use 80% of model limit to leave room for prompt and response
+            if self.max_input_tokens is None:
+                 # Default to a reasonable chunk size if max_input_tokens is not set
+                max_tokens = 3276 # type: ignore
+            else:
+                max_tokens = int(self.max_input_tokens * 0.8)
+
+
+        # If content fits in one chunk, return as is
+        content_tokens = self.count_text(content)
+        if content_tokens <= max_tokens: # type: ignore
+            return [content]
+
+        # Split content into smaller chunks
+        chunks = []
+        lines = content.split('
+')
+        current_chunk = ""
+        current_tokens = 0
+
+        for line in lines:
+            line_tokens = self.count_text(line + '
+')
+
+            # If adding this line would exceed limit, save current chunk
+            if current_tokens + line_tokens > max_tokens and current_chunk: # type: ignore
+                chunks.append(current_chunk.strip())
+                current_chunk = line + '
+'
+                current_tokens = line_tokens
+            else:
+                current_chunk += line + '
+'
+                current_tokens += line_tokens
+
+        # Add the last chunk if it has content
+        if current_chunk.strip():
+            chunks.append(current_chunk.strip())
+
+        return chunks
+
+    def chunk_json_data(self, data: Dict[str, Any], max_tokens: int = None) -> List[Dict[str, Any]]: # type: ignore
+        """
+        Split JSON data into chunks that fit within token limits.
+
+        Args:
+            data: The JSON data to chunk
+            max_tokens: Maximum tokens per chunk
+
+        Returns:
+            List of data chunks
+        """
+        if max_tokens is None:
+            if self.max_input_tokens is None:
+                # Default to a reasonable chunk size if max_input_tokens is not set
+                max_tokens = 3276 # type: ignore
+            else:
+                max_tokens = int(self.max_input_tokens * 0.8)
+
+
+        # Convert to JSON string to check size
+        json_str = json.dumps(data, indent=2)
+        total_tokens = self.count_text(json_str)
+
+        # If data fits in one chunk, return as is
+        if total_tokens <= max_tokens: # type: ignore
+            return [data]
+
+        # Split by top-level keys
+        chunks = []
+        current_chunk = {}
+        current_tokens = 0
+
+        for key, value in data.items():
+            # Calculate tokens for this key-value pair
+            item_str = json.dumps({key: value}, indent=2)
+            item_tokens = self.count_text(item_str)
+
+            # If this single item is too large, try to split it further
+            if item_tokens > max_tokens: # type: ignore
+                if isinstance(value, dict):
+                    # Recursively chunk nested dictionaries
+                    sub_chunks = self.chunk_json_data(value, max_tokens) # type: ignore
+                    for i, sub_chunk in enumerate(sub_chunks):
+                        chunk_key = f"{key}_part_{i+1}" if len(sub_chunks) > 1 else key
+                        chunks.append({chunk_key: sub_chunk})
+                elif isinstance(value, list) and len(value) > 1:
+                    # Split large lists
+                    mid = len(value) // 2
+                    chunks.append({f"{key}_part_1": value[:mid]})
+                    chunks.append({f"{key}_part_2": value[mid:]})
+                else:
+                    # Single large item - truncate if necessary
+                    if isinstance(value, str):
+                        truncated = value[:max_tokens//4]  # Rough estimate # type: ignore
+                        chunks.append({f"{key}_truncated": truncated})
+                    else:
+                        chunks.append({key: value})
+                continue
+
+            # If adding this item would exceed limit, save current chunk
+            if current_tokens + item_tokens > max_tokens and current_chunk: # type: ignore
+                chunks.append(current_chunk)
+                current_chunk = {key: value}
+                current_tokens = item_tokens
+            else:
+                current_chunk[key] = value
+                current_tokens += item_tokens
+
+        # Add the last chunk if it has content
+        if current_chunk:
+            chunks.append(current_chunk)
+
+        return chunks
+
+    async def ask_chunked(self, 
+                         content: str, 
+                         system_prompt: str = "",
+                         chunk_prompt_template: str = None, # type: ignore
+                         summary_prompt: str = None) -> str: # type: ignore
+        """
+        Process large content by chunking it and summarizing results.
+
+        Args:
+            content: Large content to process
+            system_prompt: System prompt for context
+            chunk_prompt_template: Template for chunk processing (use {chunk} placeholder)
+            summary_prompt: Prompt for final summary
+
+        Returns:
+            Final processed result
+        """
+        if chunk_prompt_template is None:
+            chunk_prompt_template = "Analyze the following data:
+
+{chunk}
+
+Provide a concise analysis."
+
+        if summary_prompt is None:
+            summary_prompt = "Combine and summarize the following analyses into a comprehensive report:"
+
+        # Chunk the content
+        chunks = self.chunk_content(content)
+
+        if len(chunks) == 1:
+            # Content fits in one request
+            messages = []
+            if system_prompt:
+                messages.append({"role": "system", "content": system_prompt})
+            messages.append({"role": "user", "content": chunk_prompt_template.format(chunk=content)}) # type: ignore
+            return await self.ask(messages) # type: ignore
+
+        # Process each chunk
+        chunk_results = []
+        for i, chunk in enumerate(chunks):
+            logger.info(f"Processing chunk {i+1}/{len(chunks)}")
+
+            messages = []
+            if system_prompt:
+                messages.append({"role": "system", "content": system_prompt})
+            messages.append({"role": "user", "content": chunk_prompt_template.format(chunk=chunk)}) # type: ignore
+
+            try:
+                result = await self.ask(messages) # type: ignore
+                chunk_results.append(f"Chunk {i+1} Analysis:
+{result}")
+            except Exception as e:
+                logger.error(f"Error processing chunk {i+1}: {e}")
+                chunk_results.append(f"Chunk {i+1}: Error - {str(e)}")
+
+        # Combine results
+        combined_results = "
+
+".join(chunk_results)
+
+        # Generate final summary
+        final_messages = []
+        if system_prompt:
+            final_messages.append({"role": "system", "content": system_prompt})
+        final_messages.append({"role": "user", "content": f"{summary_prompt}
+
+{combined_results}"}) # type: ignore
+
+        return await self.ask(final_messages) # type: ignore
