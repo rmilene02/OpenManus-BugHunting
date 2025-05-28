@@ -1,0 +1,82 @@
+# Example Custom Rules for OpenManus-BugHunting AI
+# Copy this file and customize for your specific bug hunting needs
+
+[custom_bug_bounty_rules]
+# Custom rules for specific bug bounty programs
+program_name = "Example Bug Bounty Program"
+scope_domains = ["example.com", "*.example.com", "api.example.com"]
+out_of_scope = ["admin.example.com", "internal.example.com"]
+
+# Custom testing rules for this program
+allowed_techniques = ["subdomain_enumeration", "directory_discovery", "parameter_fuzzing"]
+forbidden_techniques = ["sql_injection_testing", "xss_testing", "brute_force"]
+rate_limit_requests_per_second = 5
+max_concurrent_connections = 2
+
+# Specific vulnerabilities to focus on
+priority_vulnerabilities = ["IDOR", "Authentication_Bypass", "Information_Disclosure"]
+excluded_vulnerabilities = ["Self_XSS", "Missing_Security_Headers"]
+
+[custom_wordlists]
+# Custom wordlist configurations
+[custom_wordlists.company_specific]
+name = "Company Specific Terms"
+path = "/path/to/custom/company-wordlist.txt"
+description = "Company-specific terms and patterns"
+use_cases = ["targeted_discovery", "company_specific_testing"]
+
+[custom_wordlists.technology_stack]
+name = "Technology Stack"
+path = "/path/to/custom/tech-stack-wordlist.txt"
+description = "Wordlist based on known technology stack"
+use_cases = ["technology_specific_testing"]
+
+[custom_tool_preferences]
+# Custom tool preferences and configurations
+preferred_subdomain_tools = ["subfinder", "amass"]
+preferred_directory_tools = ["ffuf", "gobuster"]
+preferred_vulnerability_tools = ["nuclei"]
+
+# Custom tool configurations
+[custom_tool_preferences.nuclei_custom]
+templates_path = "/path/to/custom/nuclei-templates"
+severity_filter = ["high", "critical"]
+exclude_tags = ["dos", "intrusive"]
+
+[custom_reporting]
+# Custom reporting preferences
+include_company_branding = true
+custom_report_template = "/path/to/custom/report-template.html"
+executive_summary_focus = ["business_impact", "remediation_priority"]
+
+# Custom severity classification
+[custom_reporting.severity_override]
+information_disclosure = "medium"  # Override default severity
+missing_security_headers = "low"
+admin_panel_exposure = "high"
+
+[custom_compliance]
+# Custom compliance requirements
+required_frameworks = ["SOC2", "ISO27001"]
+custom_controls = ["Data_Encryption", "Access_Controls", "Audit_Logging"]
+
+[custom_ai_instructions]
+# Custom instructions for AI behavior
+focus_areas = [
+    "Look for business logic vulnerabilities",
+    "Pay special attention to API endpoints",
+    "Focus on authentication and authorization flaws",
+    "Prioritize findings that could lead to data exposure"
+]
+
+avoid_areas = [
+    "Do not test payment processing endpoints",
+    "Avoid testing user registration flows",
+    "Skip social media integration testing"
+]
+
+special_considerations = [
+    "This target uses a custom authentication system",
+    "API rate limiting is strictly enforced",
+    "WAF is known to be very sensitive"
+]

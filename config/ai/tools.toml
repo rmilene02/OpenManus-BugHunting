@@ -1,0 +1,295 @@
+# OpenManus-BugHunting Tools Configuration
+# Define available tools and their capabilities for AI selection
+
+[subdomain_enumeration]
+[subdomain_enumeration.subfinder]
+name = "Subfinder"
+description = "Fast passive subdomain discovery tool"
+type = "passive"
+speed = "fast"
+accuracy = "high"
+stealth = "high"
+command = "subfinder -d {domain} -silent"
+output_format = "text"
+rate_limit = "medium"
+use_cases = ["passive_recon", "subdomain_discovery", "certificate_transparency"]
+pros = ["Fast execution", "Multiple data sources", "Low detection risk"]
+cons = ["Passive only", "May miss some subdomains"]
+
+[subdomain_enumeration.amass]
+name = "Amass"
+description = "Comprehensive subdomain enumeration and network mapping"
+type = "active_passive"
+speed = "slow"
+accuracy = "very_high"
+stealth = "medium"
+command = "amass enum -d {domain} -passive"
+output_format = "text"
+rate_limit = "low"
+use_cases = ["comprehensive_recon", "network_mapping", "dns_enumeration"]
+pros = ["Very thorough", "Multiple techniques", "Network mapping"]
+cons = ["Slower execution", "More detectable"]
+
+[subdomain_enumeration.assetfinder]
+name = "Assetfinder"
+description = "Find domains and subdomains related to a given domain"
+type = "passive"
+speed = "fast"
+accuracy = "medium"
+stealth = "high"
+command = "assetfinder --subs-only {domain}"
+output_format = "text"
+rate_limit = "high"
+use_cases = ["quick_recon", "subdomain_discovery"]
+pros = ["Very fast", "Simple usage", "Good for quick scans"]
+cons = ["Limited sources", "Basic functionality"]
+
+[subdomain_enumeration.gobuster_dns]
+name = "Gobuster DNS"
+description = "DNS subdomain brute-forcing tool"
+type = "active"
+speed = "medium"
+accuracy = "high"
+stealth = "low"
+command = "gobuster dns -d {domain} -w {wordlist} -q"
+output_format = "text"
+rate_limit = "low"
+use_cases = ["brute_force", "comprehensive_discovery"]
+pros = ["Finds hidden subdomains", "Customizable wordlists"]
+cons = ["Noisy", "Easily detected", "Requires good wordlists"]
+
+[web_discovery]
+[web_discovery.httpx]
+name = "HTTPX"
+description = "Fast and multi-purpose HTTP toolkit"
+type = "active"
+speed = "fast"
+accuracy = "high"
+stealth = "medium"
+command = "httpx -l {input_file} -silent -mc 200,301,302,403"
+output_format = "json"
+rate_limit = "medium"
+use_cases = ["web_discovery", "technology_detection", "status_checking"]
+pros = ["Fast execution", "Rich output", "Technology detection"]
+cons = ["Active scanning", "May trigger WAF"]
+
+[web_discovery.whatweb]
+name = "WhatWeb"
+description = "Web technology identification tool"
+type = "active"
+speed = "medium"
+accuracy = "very_high"
+stealth = "medium"
+command = "whatweb {url} --log-brief=-"
+output_format = "text"
+rate_limit = "medium"
+use_cases = ["technology_identification", "fingerprinting"]
+pros = ["Detailed technology info", "Plugin system", "Accurate results"]
+cons = ["Slower than httpx", "May be detected"]
+
+[web_discovery.wafw00f]
+name = "Wafw00f"
+description = "Web Application Firewall detection tool"
+type = "active"
+speed = "fast"
+accuracy = "high"
+stealth = "low"
+command = "wafw00f {url}"
+output_format = "text"
+rate_limit = "medium"
+use_cases = ["waf_detection", "security_assessment"]
+pros = ["WAF identification", "Fast execution"]
+cons = ["Easily detected", "Limited to WAF detection"]
+
+[network_scanning]
+[network_scanning.nmap]
+name = "Nmap"
+description = "Network discovery and security auditing tool"
+type = "active"
+speed = "medium"
+accuracy = "very_high"
+stealth = "configurable"
+command = "nmap -sS -sV -O {target} -oX {output}"
+output_format = "xml"
+rate_limit = "low"
+use_cases = ["port_scanning", "service_detection", "os_fingerprinting"]
+pros = ["Comprehensive", "Highly configurable", "Industry standard"]
+cons = ["Can be noisy", "May trigger IDS"]
+
+[network_scanning.masscan]
+name = "Masscan"
+description = "Fast port scanner"
+type = "active"
+speed = "very_fast"
+accuracy = "medium"
+stealth = "low"
+command = "masscan {target} -p1-65535 --rate=1000"
+output_format = "text"
+rate_limit = "configurable"
+use_cases = ["fast_port_scanning", "large_networks"]
+pros = ["Extremely fast", "Good for large ranges"]
+cons = ["Very noisy", "Basic functionality"]
+
+[vulnerability_scanning]
+[vulnerability_scanning.nuclei]
+name = "Nuclei"
+description = "Fast vulnerability scanner with templates"
+type = "active"
+speed = "fast"
+accuracy = "high"
+stealth = "medium"
+command = "nuclei -u {url} -t {templates} -json"
+output_format = "json"
+rate_limit = "medium"
+use_cases = ["vulnerability_scanning", "template_based_testing"]
+pros = ["Template-based", "Fast execution", "Regular updates"]
+cons = ["Template dependent", "May have false positives"]
+
+[vulnerability_scanning.nikto]
+name = "Nikto"
+description = "Web server vulnerability scanner"
+type = "active"
+speed = "slow"
+accuracy = "medium"
+stealth = "low"
+command = "nikto -h {url} -Format txt"
+output_format = "text"
+rate_limit = "low"
+use_cases = ["web_vulnerability_scanning", "server_assessment"]
+pros = ["Comprehensive checks", "Well-known tool"]
+cons = ["Slow", "Noisy", "Many false positives"]
+
+[vulnerability_scanning.sqlmap]
+name = "SQLMap"
+description = "Automatic SQL injection detection and exploitation"
+type = "active"
+speed = "slow"
+accuracy = "very_high"
+stealth = "low"
+command = "sqlmap -u {url} --batch --level=1 --risk=1"
+output_format = "text"
+rate_limit = "low"
+use_cases = ["sql_injection_testing", "database_exploitation"]
+pros = ["Highly accurate", "Exploitation capabilities"]
+cons = ["Very noisy", "Slow", "Easily detected"]
+
+[directory_enumeration]
+[directory_enumeration.gobuster]
+name = "Gobuster"
+description = "Directory and file brute-forcing tool"
+type = "active"
+speed = "fast"
+accuracy = "high"
+stealth = "low"
+command = "gobuster dir -u {url} -w {wordlist} -q"
+output_format = "text"
+rate_limit = "medium"
+use_cases = ["directory_discovery", "file_enumeration"]
+pros = ["Fast execution", "Customizable wordlists"]
+cons = ["Noisy", "Brute force approach"]
+
+[directory_enumeration.ffuf]
+name = "FFUF"
+description = "Fast web fuzzer"
+type = "active"
+speed = "very_fast"
+accuracy = "high"
+stealth = "low"
+command = "ffuf -w {wordlist} -u {url}/FUZZ -mc 200,301,302,403"
+output_format = "json"
+rate_limit = "high"
+use_cases = ["web_fuzzing", "parameter_discovery", "directory_enumeration"]
+pros = ["Very fast", "Flexible", "Multiple fuzzing modes"]
+cons = ["Can be very noisy", "Requires good wordlists"]
+
+[directory_enumeration.dirb]
+name = "Dirb"
+description = "Web content scanner"
+type = "active"
+speed = "medium"
+accuracy = "medium"
+stealth = "low"
+command = "dirb {url} {wordlist} -S"
+output_format = "text"
+rate_limit = "low"
+use_cases = ["directory_discovery", "content_scanning"]
+pros = ["Simple usage", "Built-in wordlists"]
+cons = ["Slower than modern tools", "Limited features"]
+
+[osint]
+[osint.theharvester]
+name = "TheHarvester"
+description = "OSINT tool for gathering emails, subdomains, hosts, employee names"
+type = "passive"
+speed = "medium"
+accuracy = "high"
+stealth = "very_high"
+command = "theharvester -d {domain} -b all"
+output_format = "text"
+rate_limit = "high"
+use_cases = ["email_harvesting", "employee_enumeration", "passive_recon"]
+pros = ["Completely passive", "Multiple sources", "OSINT focused"]
+cons = ["Limited to public information", "Source dependent"]
+
+[osint.shodan]
+name = "Shodan"
+description = "Search engine for Internet-connected devices"
+type = "passive"
+speed = "fast"
+accuracy = "high"
+stealth = "very_high"
+command = "shodan search {query}"
+output_format = "json"
+rate_limit = "api_limited"
+use_cases = ["device_discovery", "service_enumeration", "passive_recon"]
+pros = ["Passive", "Rich data", "Global coverage"]
+cons = ["Requires API key", "Rate limited"]
+
+[osint.censys]
+name = "Censys"
+description = "Search engine for Internet-connected devices and certificates"
+type = "passive"
+speed = "fast"
+accuracy = "high"
+stealth = "very_high"
+command = "censys search {query}"
+output_format = "json"
+rate_limit = "api_limited"
+use_cases = ["certificate_analysis", "service_discovery", "passive_recon"]
+pros = ["Certificate transparency", "Passive", "Detailed data"]
+cons = ["Requires API key", "Rate limited"]
+
+[tool_categories]
+# Define tool categories and their purposes
+passive_recon = ["subfinder", "assetfinder", "theharvester", "shodan", "censys"]
+active_recon = ["amass", "gobuster_dns", "httpx", "whatweb", "nmap"]
+web_testing = ["httpx", "whatweb", "wafw00f", "nuclei", "nikto"]
+vulnerability_assessment = ["nuclei", "nikto", "sqlmap", "nmap"]
+content_discovery = ["gobuster", "ffuf", "dirb"]
+stealth_tools = ["subfinder", "assetfinder", "theharvester", "shodan", "censys"]
+fast_tools = ["httpx", "subfinder", "ffuf", "masscan"]
+comprehensive_tools = ["amass", "nmap", "nuclei"]
+
+[selection_rules]
+# Rules for AI tool selection based on context
+[selection_rules.stealth_mode]
+preferred_tools = ["subfinder", "assetfinder", "theharvester", "shodan", "censys"]
+avoid_tools = ["sqlmap", "nikto", "masscan", "gobuster_dns"]
+max_concurrent = 2
+rate_limit_multiplier = 0.5
+
+[selection_rules.fast_scan]
+preferred_tools = ["httpx", "subfinder", "ffuf", "masscan"]
+avoid_tools = ["amass", "nikto", "sqlmap"]
+max_concurrent = 5
+rate_limit_multiplier = 2.0
+
+[selection_rules.comprehensive_scan]
+preferred_tools = ["amass", "nmap", "nuclei", "gobuster", "theharvester"]
+avoid_tools = []
+max_concurrent = 3
+rate_limit_multiplier = 1.0
+
+[selection_rules.passive_only]
+allowed_tools = ["subfinder", "assetfinder", "theharvester", "shodan", "censys"]
+forbidden_tools = ["nmap", "sqlmap", "nikto", "gobuster", "ffuf", "masscan"]

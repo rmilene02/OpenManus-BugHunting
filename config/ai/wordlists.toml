@@ -1,0 +1,264 @@
+# OpenManus-BugHunting Wordlists Configuration
+# Define available wordlists and their optimal usage scenarios
+
+[seclists_paths]
+# SecLists directory structure and paths
+base_path = "/usr/share/seclists"
+discovery_path = "/usr/share/seclists/Discovery"
+fuzzing_path = "/usr/share/seclists/Fuzzing"
+passwords_path = "/usr/share/seclists/Passwords"
+usernames_path = "/usr/share/seclists/Usernames"
+payloads_path = "/usr/share/seclists/Payloads"
+
+[directory_wordlists]
+# Directory and file discovery wordlists
+[directory_wordlists.common]
+name = "Common Directories"
+path = "/usr/share/seclists/Discovery/Web-Content/common.txt"
+size = "small"
+description = "Most common web directories and files"
+use_cases = ["quick_scan", "initial_discovery"]
+target_types = ["web_applications", "apis"]
+estimated_requests = 4614
+
+[directory_wordlists.big]
+name = "Big Directory List"
+path = "/usr/share/seclists/Discovery/Web-Content/big.txt"
+size = "large"
+description = "Comprehensive directory and file list"
+use_cases = ["thorough_scan", "comprehensive_discovery"]
+target_types = ["web_applications", "cms"]
+estimated_requests = 20469
+
+[directory_wordlists.raft_medium]
+name = "Raft Medium Directories"
+path = "/usr/share/seclists/Discovery/Web-Content/raft-medium-directories.txt"
+size = "medium"
+description = "Medium-sized directory list from RAFT project"
+use_cases = ["balanced_scan", "directory_focus"]
+target_types = ["web_applications"]
+estimated_requests = 30000
+
+[directory_wordlists.raft_medium_files]
+name = "Raft Medium Files"
+path = "/usr/share/seclists/Discovery/Web-Content/raft-medium-files.txt"
+size = "medium"
+description = "Medium-sized file list from RAFT project"
+use_cases = ["file_discovery", "backup_hunting"]
+target_types = ["web_applications"]
+estimated_requests = 17128
+
+[directory_wordlists.quickhits]
+name = "QuickHits"
+path = "/usr/share/seclists/Discovery/Web-Content/quickhits.txt"
+size = "small"
+description = "Quick hits for common vulnerabilities"
+use_cases = ["vulnerability_discovery", "quick_wins"]
+target_types = ["web_applications", "apis"]
+estimated_requests = 2439
+
+[api_wordlists]
+# API-specific wordlists
+[api_wordlists.api_endpoints]
+name = "API Endpoints"
+path = "/usr/share/seclists/Discovery/Web-Content/api/api-endpoints.txt"
+size = "medium"
+description = "Common API endpoints and paths"
+use_cases = ["api_discovery", "endpoint_enumeration"]
+target_types = ["apis", "rest_apis", "graphql"]
+estimated_requests = 174
+
+[api_wordlists.graphql]
+name = "GraphQL"
+path = "/usr/share/seclists/Discovery/Web-Content/graphql.txt"
+size = "small"
+description = "GraphQL-specific endpoints and queries"
+use_cases = ["graphql_discovery", "schema_enumeration"]
+target_types = ["graphql_apis"]
+estimated_requests = 87
+
+[subdomain_wordlists]
+# Subdomain enumeration wordlists
+[subdomain_wordlists.subdomains_top1million]
+name = "Top 1 Million Subdomains"
+path = "/usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt"
+size = "large"
+description = "Top 1 million most common subdomains"
+use_cases = ["comprehensive_subdomain_discovery"]
+target_types = ["domains", "large_organizations"]
+estimated_requests = 110000
+
+[subdomain_wordlists.fierce_hostlist]
+name = "Fierce Hostlist"
+path = "/usr/share/seclists/Discovery/DNS/fierce-hostlist.txt"
+size = "small"
+description = "Common hostnames for subdomain discovery"
+use_cases = ["quick_subdomain_scan", "common_hosts"]
+target_types = ["domains"]
+estimated_requests = 1909
+
+[subdomain_wordlists.bitquark]
+name = "Bitquark Subdomains"
+path = "/usr/share/seclists/Discovery/DNS/bitquark-subdomains-top100000.txt"
+size = "large"
+description = "Top 100k subdomains from Bitquark research"
+use_cases = ["thorough_subdomain_discovery"]
+target_types = ["domains", "enterprises"]
+estimated_requests = 100000
+
+[technology_specific]
+# Technology-specific wordlists
+[technology_specific.apache]
+name = "Apache"
+path = "/usr/share/seclists/Discovery/Web-Content/apache.txt"
+size = "small"
+description = "Apache-specific files and directories"
+use_cases = ["apache_enumeration", "server_specific"]
+target_types = ["apache_servers"]
+estimated_requests = 78
+
+[technology_specific.nginx]
+name = "Nginx"
+path = "/usr/share/seclists/Discovery/Web-Content/nginx.txt"
+size = "small"
+description = "Nginx-specific files and directories"
+use_cases = ["nginx_enumeration", "server_specific"]
+target_types = ["nginx_servers"]
+estimated_requests = 95
+
+[technology_specific.iis]
+name = "IIS"
+path = "/usr/share/seclists/Discovery/Web-Content/IIS.fuzz.txt"
+size = "small"
+description = "IIS-specific files and directories"
+use_cases = ["iis_enumeration", "windows_servers"]
+target_types = ["iis_servers", "windows"]
+estimated_requests = 211
+
+[technology_specific.wordpress]
+name = "WordPress"
+path = "/usr/share/seclists/Discovery/Web-Content/CMS/wordpress.fuzz.txt"
+size = "medium"
+description = "WordPress-specific paths and files"
+use_cases = ["wordpress_enumeration", "cms_testing"]
+target_types = ["wordpress_sites"]
+estimated_requests = 8180
+
+[technology_specific.drupal]
+name = "Drupal"
+path = "/usr/share/seclists/Discovery/Web-Content/CMS/drupal.txt"
+size = "small"
+description = "Drupal-specific paths and files"
+use_cases = ["drupal_enumeration", "cms_testing"]
+target_types = ["drupal_sites"]
+estimated_requests = 124
+
+[technology_specific.joomla]
+name = "Joomla"
+path = "/usr/share/seclists/Discovery/Web-Content/CMS/joomla.txt"
+size = "small"
+description = "Joomla-specific paths and files"
+use_cases = ["joomla_enumeration", "cms_testing"]
+target_types = ["joomla_sites"]
+estimated_requests = 32
+
+[parameter_wordlists]
+# Parameter fuzzing wordlists
+[parameter_wordlists.burp_parameters]
+name = "Burp Parameter Names"
+path = "/usr/share/seclists/Discovery/Web-Content/burp-parameter-names.txt"
+size = "medium"
+description = "Common parameter names from Burp Suite"
+use_cases = ["parameter_discovery", "hidden_parameters"]
+target_types = ["web_applications", "apis"]
+estimated_requests = 6453
+
+[parameter_wordlists.common_parameters]
+name = "Common Parameters"
+path = "/usr/share/seclists/Discovery/Web-Content/common-parameters.txt"
+size = "small"
+description = "Most common web parameters"
+use_cases = ["quick_parameter_scan"]
+target_types = ["web_applications"]
+estimated_requests = 1000
+
+[backup_files]
+# Backup and sensitive file wordlists
+[backup_files.backup_files_only]
+name = "Backup Files"
+path = "/usr/share/seclists/Discovery/Web-Content/backup-files-only.txt"
+size = "small"
+description = "Common backup file patterns"
+use_cases = ["backup_discovery", "sensitive_files"]
+target_types = ["web_applications"]
+estimated_requests = 39
+
+[backup_files.sensitive_files]
+name = "Sensitive Files"
+path = "/usr/share/seclists/Discovery/Web-Content/sensitive-files.txt"
+size = "small"
+description = "Sensitive files and configurations"
+use_cases = ["information_disclosure", "config_files"]
+target_types = ["web_applications", "servers"]
+estimated_requests = 124
+
+[custom_wordlists]
+# Custom wordlists for specific scenarios
+[custom_wordlists.bug_bounty]
+name = "Bug Bounty Focused"
+path = "/usr/share/seclists/Discovery/Web-Content/bug-bounty-wordlist.txt"
+size = "medium"
+description = "Curated wordlist for bug bounty hunting"
+use_cases = ["bug_bounty", "vulnerability_discovery"]
+target_types = ["web_applications", "apis"]
+estimated_requests = 5000
+
+[custom_wordlists.admin_panels]
+name = "Admin Panels"
+path = "/usr/share/seclists/Discovery/Web-Content/admin-panels.txt"
+size = "small"
+description = "Common admin panel locations"
+use_cases = ["admin_discovery", "privilege_escalation"]
+target_types = ["web_applications", "cms"]
+estimated_requests = 137
+
+[selection_rules]
+# Rules for wordlist selection based on context
+[selection_rules.quick_scan]
+max_requests = 5000
+preferred_wordlists = ["common", "quickhits", "admin_panels"]
+time_constraint = "fast"
+
+[selection_rules.balanced_scan]
+max_requests = 25000
+preferred_wordlists = ["raft_medium", "burp_parameters", "bug_bounty"]
+time_constraint = "normal"
+
+[selection_rules.comprehensive_scan]
+max_requests = 100000
+preferred_wordlists = ["big", "raft_medium_files", "subdomains_top1million"]
+time_constraint = "thorough"
+
+[selection_rules.stealth_scan]
+max_requests = 2000
+preferred_wordlists = ["common", "sensitive_files", "backup_files_only"]
+rate_limit = "conservative"
+
+[technology_mapping]
+# Map detected technologies to appropriate wordlists
+apache = ["apache", "common", "sensitive_files"]
+nginx = ["nginx", "common", "sensitive_files"]
+iis = ["iis", "common", "sensitive_files"]
+wordpress = ["wordpress", "common", "admin_panels"]
+drupal = ["drupal", "common", "admin_panels"]
+joomla = ["joomla", "common", "admin_panels"]
+api = ["api_endpoints", "burp_parameters", "common_parameters"]
+graphql = ["graphql", "api_endpoints", "common_parameters"]
+
+[wordlist_combinations]
+# Recommended wordlist combinations for different scenarios
+web_application = ["common", "raft_medium", "burp_parameters", "admin_panels"]
+api_testing = ["api_endpoints", "common_parameters", "common"]
+cms_testing = ["common", "admin_panels", "backup_files_only"]
+comprehensive = ["big", "raft_medium_files", "burp_parameters", "sensitive_files"]
+bug_bounty = ["bug_bounty", "quickhits", "admin_panels", "backup_files_only"]

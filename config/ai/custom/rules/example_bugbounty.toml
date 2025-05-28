@@ -1,0 +1,65 @@
+# Example Bug Bounty Program Configuration
+# Copy and customize this file for your specific programs
+
+[custom_bug_bounty_rules]
+program_name = "Example Bug Bounty Program"
+scope_domains = ["example.com", "*.example.com", "api.example.com"]
+out_of_scope = ["admin.example.com", "internal.example.com"]
+
+# Testing preferences
+allowed_techniques = ["subdomain_enumeration", "directory_discovery", "parameter_fuzzing"]
+forbidden_techniques = ["sql_injection_testing", "brute_force"]
+rate_limit_requests_per_second = 5
+max_concurrent_connections = 2
+
+# Priority vulnerabilities
+priority_vulnerabilities = ["IDOR", "Authentication_Bypass", "Information_Disclosure"]
+excluded_vulnerabilities = ["Self_XSS", "Missing_Security_Headers"]
+
+[custom_ai_instructions]
+focus_areas = [
+    "Look for business logic vulnerabilities in the checkout process",
+    "Pay special attention to API endpoints under /api/v1/",
+    "Focus on authentication and authorization flaws",
+    "Check for IDOR in user profile management"
+]
+
+avoid_areas = [
+    "Do not test payment processing endpoints",
+    "Avoid testing user registration flows during business hours",
+    "Skip social media integration testing"
+]
+
+special_considerations = [
+    "This target uses a custom authentication system with JWT tokens",
+    "API rate limiting is strictly enforced at 100 requests per minute",
+    "WAF is known to be very sensitive to SQL injection attempts"
+]
+
+[custom_tool_preferences]
+preferred_subdomain_tools = ["subfinder", "amass"]
+preferred_directory_tools = ["ffuf"]
+preferred_vulnerability_tools = ["nuclei"]
+
+# Custom Nuclei configuration
+[custom_tool_preferences.nuclei_custom]
+templates_path = "/usr/share/nuclei-templates"
+severity_filter = ["high", "critical"]
+exclude_tags = ["dos", "intrusive"]
+
+[custom_wordlists]
+[custom_wordlists.company_specific]
+name = "Company Specific Terms"
+path = "/path/to/custom/company-wordlist.txt"
+description = "Company-specific terms and patterns"
+use_cases = ["targeted_discovery"]
+
+[custom_reporting]
+include_company_branding = true
+executive_summary_focus = ["business_impact", "remediation_priority"]
+
+# Custom severity overrides
+[custom_reporting.severity_override]
+information_disclosure = "medium"
+missing_security_headers = "low"
+admin_panel_exposure = "high"

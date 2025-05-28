@@ -11,6 +11,7 @@ import asyncio
 from typing import Dict, List, Any, Optional
 from dataclasses import dataclass
 from app.logger import logger
+from app.core.ai_config_loader import AIConfigLoader
 
 
 @dataclass
@@ -48,10 +49,15 @@ class AIToolSelector:
     decisions about which security tools to use for specific scenarios.
     """
     
-    def __init__(self, llm_client=None):
+    def __init__(self, llm_client=None, config_path: str = "config/ai"):
         self.llm_client = llm_client
+        self.config_loader = AIConfigLoader(config_path)
         self.available_tools = self._initialize_tool_database()
         self.selection_history = []
+        
+        # Validate configuration
+        if not self.config_loader.validate_config():
+            logger.warning("AI configuration validation failed, using fallback settings")
     
     def _initialize_tool_database(self) -> Dict[str, ToolInfo]:
         """Initialize the database of available security tools"""
@@ -281,10 +287,28 @@ class AIToolSelector:
         return selected_tools
     
     def _create_tool_selection_prompt(self, context: ScanContext, available_tools: Dict[str, ToolInfo]) -> str:
-        """Create a detailed prompt for the AI to select appropriate tools"""
+        """Create a detailed prompt for the AI to select appropriate tools using modular configuration"""
+        
+        # Get system prompt from configuration
+        system_prompt = self.config_loader.get_system_prompt(include_custom_rules=True)
+        
+        # Get tool selection rules
+        scan_context_dict = {
+            "target": context.target,
+            "target_type": context.target_type,
+            "scan_mode": context.scan_mode,
+            "passive_only": context.passive_only,
+            "deep_scan": context.deep_scan,
+            "stealth_mode": context.stealth_mode,
+            "time_constraint": context.time_constraint
+        }
+        selection_rules = self.config_loader.get_tool_selection_rules(scan_context_dict)
+        
+        # Get available tools from configuration
+        config_tools = self.config_loader.get_available_tools()
         
         prompt = f"""
-You are an expert cybersecurity professional tasked with selecting the most appropriate security tools for a reconnaissance and vulnerability assessment.
+{system_prompt}
 
 TARGET INFORMATION:
 - Target: {context.target}
@@ -298,19 +322,44 @@ TARGET INFORMATION:
 AVAILABLE TOOLS:
 """
         
-        # Add tool information
-        for tool_name, tool_info in available_tools.items():
-            prompt += f"""
+        # Add tool information from configuration
+        for category, tools in config_tools.items():
+            prompt += f"\n{category.upper().replace('_', ' ')} TOOLS:\n"
+            for tool_name, tool_config in tools.items():
+                if tool_name in available_tools:  # Only include actually available tools
+                    prompt += f"""
 {tool_name.upper()}:
-- Category: {tool_info.category}
-- Description: {tool_info.description}
-- Strengths: {', '.join(tool_info.strengths)}
-- Weaknesses: {', '.join(tool_info.weaknesses)}
-- Speed: {tool_info.speed}
-- Accuracy: {tool_info.accuracy}
-- Stealth: {tool_info.stealth}
-- Use Cases: {', '.join(tool_info.use_cases)}
+- Description: {tool_config.get('description', 'No description')}
+- Type: {tool_config.get('type', 'unknown')}
+- Speed: {tool_config.get('speed', 'unknown')}
+- Accuracy: {tool_config.get('accuracy', 'unknown')}
+- Stealth: {tool_config.get('stealth', 'unknown')}
+- Use Cases: {', '.join(tool_config.get('use_cases', []))}
+- Pros: {', '.join(tool_config.get('pros', []))}
+- Cons: {', '.join(tool_config.get('cons', []))}
 """
+        
+        # Add selection rules if available
+        if selection_rules:
+            prompt += "\nSELECTION RULES AND PREFERENCES:\n"
+            if "preferred_tools" in selection_rules:
+                prompt += f"- Preferred tools: {', '.join(selection_rules['preferred_tools'])}\n"
+            if "avoid_tools" in selection_rules:
+                prompt += f"- Avoid tools: {', '.join(selection_rules['avoid_tools'])}\n"
+            if "max_concurrent" in selection_rules:
+                prompt += f"- Maximum concurrent tools: {selection_rules['max_concurrent']}\n"
+            if "rate_limit_multiplier" in selection_rules:
+                prompt += f"- Rate limit multiplier: {selection_rules['rate_limit_multiplier']}\n"
+        
+        # Get wordlist recommendations
+        wordlists = self.config_loader.get_wordlists_for_target(
+            context.target_type, context.scan_mode, context.time_constraint
+        )
+        if wordlists:
+            prompt += "\nRECOMMENDED WORDLISTS:\n"
+            for wordlist in wordlists[:3]:  # Limit to top 3 recommendations
+                prompt += f"- {wordlist.get('name', 'Unknown')}: {wordlist.get('path', 'No path')} "
+                prompt += f"({wordlist.get('estimated_requests', 'Unknown')} requests)\n"
         
         prompt += f"""
 
@@ -318,10 +367,12 @@ SELECTION CRITERIA:
 1. Consider the target type and scan objectives
 2. Respect the passive-only constraint if specified
 3. Balance speed vs thoroughness based on time constraints
-4. Consider stealth requirements
+4. Consider stealth requirements and detection avoidance
 5. Optimize for the specific scan mode
 6. Select complementary tools that work well together
 7. Avoid redundant tools unless they provide different perspectives
+8. Follow any custom rules and preferences specified above
+9. Consider wordlist recommendations for directory/parameter fuzzing
 
 TASK:
 Select the most appropriate tools for each category. Consider the trade-offs between speed, accuracy, and stealth. 
