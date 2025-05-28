@@ -384,39 +384,75 @@ async def main():
     if not args.disable_ai:
         try:
             import os
+            import toml
             from app.config import LLMSettings
             
-            # Get API key based on API type
-            if args.llm_api_type == 'deepseek':
-                api_key = args.llm_api_key or os.getenv('DEEPSEEK_API_KEY')
-                default_base_url = 'https://api.deepseek.com'
-                default_model = 'deepseek-chat'
-            else:
-                api_key = args.llm_api_key or os.getenv('OPENAI_API_KEY')
-                default_base_url = 'https://api.openai.com/v1'
-                default_model = 'gpt-4'
+            # Load configuration from config.toml
+            config_path = "/home/kali/OpenManus-BugHunting/config/config.toml"
+            if not os.path.exists(config_path):
+                # Fallback to local config paths
+                config_path = "./config/config.toml"
+                if not os.path.exists(config_path):
+                    config_path = "./config.toml"
             
-            if api_key:
-                # Create a custom LLM config
-                llm_config = LLMSettings(
-                    model=args.llm_model if args.llm_model != 'gpt-4' else default_model,
-                    api_key=api_key,
-                    base_url=args.llm_base_url if args.llm_base_url != 'https://api.openai.com/v1' else default_base_url,
-                    temperature=args.ai_temperature,
-                    max_tokens=4000,
-                    api_type=args.llm_api_type,
-                    api_version="2024-02-01"
-                )
+            if os.path.exists(config_path):
+                logger.info(f"📁 Loading configuration from: {config_path}")
+                config_data = toml.load(config_path)
+                llm_config_data = config_data.get('llm', {})
                 
-                # Create LLM instance with custom config
-                llm_client = LLM(config_name="custom", llm_config={"custom": llm_config})
-                logger.info(f"🤖 AI-powered tool selection enabled with {args.llm_model}")
-            else:
-                logger.warning("⚠️  No LLM API key provided, AI features disabled")
-                if args.llm_api_type == 'deepseek':
-                    logger.warning("   Set DEEPSEEK_API_KEY environment variable or use --llm-api-key")
+                # Use config file values, override with command line if provided
+                api_key = args.llm_api_key or llm_config_data.get('api_key')
+                model = args.llm_model if args.llm_model != 'gpt-4' else llm_config_data.get('model', 'deepseek-chat')
+                base_url = args.llm_base_url if args.llm_base_url != 'https://api.openai.com/v1' else llm_config_data.get('base_url', 'https://api.deepseek.com/v1')
+                api_type = args.llm_api_type or llm_config_data.get('api_type', 'deepseek')
+                temperature = args.ai_temperature or llm_config_data.get('temperature', 0.3)
+                max_tokens = llm_config_data.get('max_tokens', 4096)
+                api_version = llm_config_data.get('api_version', 'v1')
+                
+                if api_key and api_key != "your-api-key-here":
+                    # Create LLM config
+                    llm_config = LLMSettings(
+                        model=model,
+                        api_key=api_key,
+                        base_url=base_url,
+                        temperature=temperature,
+                        max_tokens=max_tokens,
+                        api_type=api_type,
+                        api_version=api_version
+                    )
+                    
+                    # Create LLM instance with config
+                    llm_client = LLM(config_name="custom", llm_config={"custom": llm_config})
+                    logger.info(f"🤖 AI-powered tool selection enabled with {model} ({api_type})")
                 else:
-                    logger.warning("   Set OPENAI_API_KEY environment variable or use --llm-api-key")
+                    logger.warning("⚠️  No valid API key found in configuration file")
+                    logger.warning("   Please update the api_key in config/config.toml")
+            else:
+                logger.warning("⚠️  Configuration file not found, using command line arguments")
+                # Fallback to command line arguments
+                if args.llm_api_type == 'deepseek':
+                    api_key = args.llm_api_key or os.getenv('DEEPSEEK_API_KEY')
+                    default_base_url = 'https://api.deepseek.com/v1'
+                    default_model = 'deepseek-chat'
+                else:
+                    api_key = args.llm_api_key or os.getenv('OPENAI_API_KEY')
+                    default_base_url = 'https://api.openai.com/v1'
+                    default_model = 'gpt-4'
+                
+                if api_key:
+                    llm_config = LLMSettings(
+                        model=args.llm_model if args.llm_model != 'gpt-4' else default_model,
+                        api_key=api_key,
+                        base_url=args.llm_base_url if args.llm_base_url != 'https://api.openai.com/v1' else default_base_url,
+                        temperature=args.ai_temperature,
+                        max_tokens=4000,
+                        api_type=args.llm_api_type,
+                        api_version="v1"
+                    )
+                    llm_client = LLM(config_name="custom", llm_config={"custom": llm_config})
+                    logger.info(f"🤖 AI-powered tool selection enabled with {args.llm_model}")
+                else:
+                    logger.warning("⚠️  No API key found in arguments or environment variables")
         except Exception as e:
             logger.error(f"❌ Failed to initialize LLM client: {e}")
             logger.warning("🔄 Falling back to rule-based tool selection")

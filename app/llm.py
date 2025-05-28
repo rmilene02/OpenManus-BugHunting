@@ -203,7 +203,10 @@ class LLM:
                 llm_config = LLMSettings(**config_data) # Create LLMSettings instance
             elif isinstance(llm_config, dict): # Handle if a dict is passed
                 config_data = llm_config.get(config_name, list(llm_config.values())[0] if llm_config else {})
-                llm_config = LLMSettings(**config_data) # Create LLMSettings instance
+                if isinstance(config_data, LLMSettings):
+                    llm_config = config_data
+                else:
+                    llm_config = LLMSettings(**config_data) # Create LLMSettings instance
 
             self.model = llm_config.model
             self.max_tokens = llm_config.max_tokens
