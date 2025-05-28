@@ -200,3 +200,51 @@ cython_debug/
 
 # node
 node_modules
+
+### Security & Sensitive Data ###
+# API Keys and secrets
+*.key
+*.pem
+*.p12
+*.pfx
+secrets.json
+credentials.json
+api_keys.txt
+
+# Configuration files with sensitive data
+config_local.toml
+config_prod.toml
+.env.local
+.env.production
+.env.staging
+
+# Security scan results and reports
+results/
+reports/
+scans/
+output/
+*.scan
+*.report
+
+# Temporary files from security tools
+*.tmp
+*.temp
+nmap_*
+nuclei_*
+gobuster_*
+ffuf_*
+sqlmap_*
+
+# Custom wordlists (may contain sensitive info)
+custom_wordlists/
+private_wordlists/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Backup files
+*.bak
+*.backup
+*~
