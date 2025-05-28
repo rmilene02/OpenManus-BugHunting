@@ -10,6 +10,8 @@ from openai import (
     AuthenticationError,
     OpenAIError,
     RateLimitError,
+    InternalServerError,
+    APITimeoutError,
 )
 from openai.types.chat import ChatCompletion, ChatCompletionMessage
 from tenacity import (
@@ -207,7 +209,7 @@ class LLM:
             self.max_tokens = llm_config.max_tokens
             self.temperature = llm_config.temperature
             self.api_type = llm_config.api_type
-            self.api_key = llm_config.api_key.get_secret_value() if llm_config.api_key else None # type: ignore
+            self.api_key = llm_config.api_key if llm_config.api_key else None
             self.api_version = llm_config.api_version
             self.base_url = str(llm_config.base_url) if llm_config.base_url else None # type: ignore
 
@@ -242,7 +244,8 @@ class LLM:
                 # DeepSeek uses OpenAI-compatible API
                 self.client = AsyncOpenAI(
                     api_key=self.api_key, 
-                    base_url=self.base_url or "https://api.deepseek.com"
+                    base_url=self.base_url or "https://api.deepseek.com/v1",
+                    timeout=60.0  # Add timeout for DeepSeek API
                 )
             else:
                 self.client = AsyncOpenAI(api_key=self.api_key, base_url=self.base_url) # type: ignore
@@ -432,10 +435,10 @@ class LLM:
 
     @retry(
         wait=wait_random_exponential(min=1, max=60),
-        stop=stop_after_attempt(6),
+        stop=stop_after_attempt(3),
         retry=retry_if_exception_type(
-            (OpenAIError, Exception, ValueError)
-        ),  # Don't retry TokenLimitExceeded
+            (RateLimitError, InternalServerError, APITimeoutError)
+        ),  # Only retry specific transient errors
     )
     async def ask_simple(self, prompt: str, temperature: Optional[float] = None) -> str:
         """
@@ -460,9 +463,7 @@ class LLM:
             return await self.ask_chunked(
                 content=prompt,
                 system_prompt="You are a helpful AI assistant analyzing security data.",
-                chunk_prompt_template="Analyze the following data and provide key insights:
-
-{chunk}",
+                chunk_prompt_template="Analyze the following data and provide key insights:\n\n{chunk}",
                 summary_prompt="Combine the following analyses into a comprehensive summary:"
             )
 
@@ -577,10 +578,15 @@ class LLM:
             logger.exception(f"OpenAI API error")
             if isinstance(oe, AuthenticationError):
                 logger.error("Authentication failed. Check API key.")
+                if self.api_type == "deepseek":
+                    logger.error("For DeepSeek API, ensure you have a valid API key from https://platform.deepseek.com/")
             elif isinstance(oe, RateLimitError):
                 logger.error("Rate limit exceeded. Consider increasing retry attempts.")
             elif isinstance(oe, APIError):
                 logger.error(f"API error: {oe}")
+                if self.api_type == "deepseek":
+                    logger.error(f"DeepSeek API configuration - Base URL: {self.base_url}, Model: {self.model}")
+                    logger.error("Verify that your DeepSeek API key is valid and has sufficient credits.")
             raise
         except Exception:
             logger.exception(f"Unexpected error in ask")
@@ -900,24 +906,20 @@ class LLM:
 
         # Split content into smaller chunks
         chunks = []
-        lines = content.split('
-')
+        lines = content.split('\n')
         current_chunk = ""
         current_tokens = 0
 
         for line in lines:
-            line_tokens = self.count_text(line + '
-')
+            line_tokens = self.count_text(line + '\n')
 
             # If adding this line would exceed limit, save current chunk
             if current_tokens + line_tokens > max_tokens and current_chunk: # type: ignore
                 chunks.append(current_chunk.strip())
-                current_chunk = line + '
-'
+                current_chunk = line + '\n'
                 current_tokens = line_tokens
             else:
-                current_chunk += line + '
-'
+                current_chunk += line + '\n'
                 current_tokens += line_tokens
 
         # Add the last chunk if it has content
@@ -1018,11 +1020,7 @@ class LLM:
             Final processed result
         """
         if chunk_prompt_template is None:
-            chunk_prompt_template = "Analyze the following data:
-
-{chunk}
-
-Provide a concise analysis."
+            chunk_prompt_template = "Analyze the following data:\n\n{chunk}\n\nProvide a concise analysis."
 
         if summary_prompt is None:
             summary_prompt = "Combine and summarize the following analyses into a comprehensive report:"
@@ -1050,23 +1048,18 @@ Provide a concise analysis."
 
             try:
                 result = await self.ask(messages) # type: ignore
-                chunk_results.append(f"Chunk {i+1} Analysis:
-{result}")
+                chunk_results.append(f"Chunk {i+1} Analysis:\n{result}")
             except Exception as e:
                 logger.error(f"Error processing chunk {i+1}: {e}")
                 chunk_results.append(f"Chunk {i+1}: Error - {str(e)}")
 
         # Combine results
-        combined_results = "
-
-".join(chunk_results)
+        combined_results = "\n\n".join(chunk_results)
 
         # Generate final summary
         final_messages = []
         if system_prompt:
             final_messages.append({"role": "system", "content": system_prompt})
-        final_messages.append({"role": "user", "content": f"{summary_prompt}
-
-{combined_results}"}) # type: ignore
+        final_messages.append({"role": "user", "content": f"{summary_prompt}\n\n{combined_results}"}) # type: ignore
 
         return await self.ask(final_messages) # type: ignore

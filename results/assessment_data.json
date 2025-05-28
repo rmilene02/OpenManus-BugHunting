@@ -9,7 +9,7 @@
     "output_dir": "./results",
     "report_format": "html"
   },
-  "start_time": "2025-05-27T22:29:30.245323",
+  "start_time": "2025-05-28T14:56:24.278453",
   "modules_executed": [
     "reconnaissance"
   ],
@@ -25,77 +25,26 @@
         "time_constraint": "normal"
       },
       "ai_tool_selection": {
-        "subdomain_enumeration": [
-          "subfinder"
-        ],
+        "subdomain_enumeration": [],
         "web_discovery": [
-          "whatweb"
+          "httpx"
         ],
-        "network_scanning": [
-          "nmap"
-        ],
-        "vulnerability_scanning": [
-          "nikto"
-        ],
-        "directory_enumeration": [
-          "gobuster"
-        ],
-        "osint": [
-          "theharvester"
-        ]
+        "network_scanning": [],
+        "vulnerability_scanning": [],
+        "directory_enumeration": [],
+        "osint": []
       },
       "execution_results": {
-        "osint": {
-          "category": "osint",
-          "tools_executed": [
-            "theharvester"
-          ],
-          "tool_results": {
-            "theharvester": {
-              "tool": "theharvester",
-              "success": false,
-              "error": "[Errno 2] No such file or directory: 'theharvester'"
-            }
-          },
-          "aggregated_data": {
-            "category": "osint",
-            "successful_tools": 0,
-            "failed_tools": 0,
-            "total_items": 0
-          },
-          "execution_time": 0.0009412200015503913
-        },
-        "subdomain_enumeration": {
-          "category": "subdomain_enumeration",
-          "tools_executed": [
-            "subfinder"
-          ],
-          "tool_results": {
-            "subfinder": {
-              "tool": "subfinder",
-              "success": false,
-              "error": "[Errno 2] No such file or directory: 'subfinder'"
-            }
-          },
-          "aggregated_data": {
-            "category": "subdomain_enumeration",
-            "successful_tools": 0,
-            "failed_tools": 1,
-            "total_items": 0,
-            "subdomains": []
-          },
-          "execution_time": 0.0007914000016171485
-        },
         "web_discovery": {
           "category": "web_discovery",
           "tools_executed": [
-            "whatweb"
+            "httpx"
           ],
           "tool_results": {
-            "whatweb": {
-              "tool": "whatweb",
+            "httpx": {
+              "tool": "httpx",
               "success": false,
-              "error": "[Errno 2] No such file or directory: 'whatweb'"
+              "error": "Usage: httpx [OPTIONS] URL\n\nError: No such option: -l\n"
             }
           },
           "aggregated_data": {
@@ -106,68 +55,7 @@
             "live_hosts": [],
             "technologies": []
           },
-          "execution_time": 0.0007419100002152845
-        },
-        "network_scanning": {
-          "category": "network_scanning",
-          "tools_executed": [
-            "nmap"
-          ],
-          "tool_results": {
-            "nmap": {
-              "tool": "nmap",
-              "success": false,
-              "error": "[Errno 2] No such file or directory: 'nmap'"
-            }
-          },
-          "aggregated_data": {
-            "category": "network_scanning",
-            "successful_tools": 0,
-            "failed_tools": 0,
-            "total_items": 0
-          },
-          "execution_time": 0.00070753999898443
-        },
-        "vulnerability_scanning": {
-          "category": "vulnerability_scanning",
-          "tools_executed": [
-            "nikto"
-          ],
-          "tool_results": {
-            "nikto": {
-              "tool": "nikto",
-              "success": false,
-              "error": "[Errno 2] No such file or directory: 'nikto'"
-            }
-          },
-          "aggregated_data": {
-            "category": "vulnerability_scanning",
-            "successful_tools": 0,
-            "failed_tools": 1,
-            "total_items": 0,
-            "vulnerabilities": []
-          },
-          "execution_time": 0.0007097999987308867
-        },
-        "directory_enumeration": {
-          "category": "directory_enumeration",
-          "tools_executed": [
-            "gobuster"
-          ],
-          "tool_results": {
-            "gobuster": {
-              "tool": "gobuster",
-              "success": false,
-              "error": "No wordlist found"
-            }
-          },
-          "aggregated_data": {
-            "category": "directory_enumeration",
-            "successful_tools": 0,
-            "failed_tools": 0,
-            "total_items": 0
-          },
-          "execution_time": 0.0001800700010790024
+          "execution_time": 0.20573424799931672
         }
       },
       "aggregated_results": {
@@ -179,19 +67,6 @@
         "technologies_detected": [],
         "open_ports": [],
         "summary_by_category": {
-          "osint": {
-            "category": "osint",
-            "successful_tools": 0,
-            "failed_tools": 0,
-            "total_items": 0
-          },
-          "subdomain_enumeration": {
-            "category": "subdomain_enumeration",
-            "successful_tools": 0,
-            "failed_tools": 1,
-            "total_items": 0,
-            "subdomains": []
-          },
           "web_discovery": {
             "category": "web_discovery",
             "successful_tools": 0,
@@ -199,25 +74,6 @@
             "total_items": 0,
             "live_hosts": [],
             "technologies": []
-          },
-          "network_scanning": {
-            "category": "network_scanning",
-            "successful_tools": 0,
-            "failed_tools": 0,
-            "total_items": 0
-          },
-          "vulnerability_scanning": {
-            "category": "vulnerability_scanning",
-            "successful_tools": 0,
-            "failed_tools": 1,
-            "total_items": 0,
-            "vulnerabilities": []
-          },
-          "directory_enumeration": {
-            "category": "directory_enumeration",
-            "successful_tools": 0,
-            "failed_tools": 0,
-            "total_items": 0
           }
         }
       },
@@ -225,9 +81,9 @@
       "summary": {
         "target": "https://example.com",
         "scan_completed": true,
-        "total_tools_used": 6,
+        "total_tools_used": 1,
         "successful_tools": 0,
-        "failed_tools": 6,
+        "failed_tools": 1,
         "key_metrics": {
           "subdomains_found": 0,
           "live_hosts_found": 0,
@@ -238,7 +94,7 @@
       }
     },
     "reporting": {
-      "html": "reports/security_report_example.com_20250527_222930.html"
+      "html": "reports/security_report_example.com_20250528_145624.html"
     }
   },
   "ai_decisions": {
@@ -259,5 +115,5 @@
     "execution_time": null
   },
   "status": "completed",
-  "end_time": "2025-05-27T22:29:30.282758"
+  "end_time": "2025-05-28T14:56:24.519260"
 }

@@ -392,7 +392,7 @@ class SecurityOrchestrator:
 
         try:
             full_data_str = json.dumps(results, indent=2)
-            data_tokens = self.llm_client.count_tokens(full_data_str)
+            data_tokens = self.llm_client.count_text(full_data_str)
 
             # Usar uma variável local para max_input_tokens para a decisão
             current_max_tokens = self.llm_client.max_input_tokens
