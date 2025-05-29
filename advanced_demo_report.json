@@ -1,0 +1,180 @@
+{
+  "demo_summary": {
+    "title": "OpenManus-BugHunting Advanced Capabilities Demo",
+    "timestamp": "2025-05-29 16:11:44",
+    "statistics": {
+      "total_vulnerabilities": 5,
+      "critical_chains": 1,
+      "high_severity": 2,
+      "medium_severity": 2,
+      "assets_discovered": 3,
+      "parameters_tested": 9,
+      "business_logic_tests": 4
+    }
+  },
+  "capabilities_demonstrated": {
+    "recursive_reconnaissance": "✅ Implementado",
+    "intelligent_fuzzing": "✅ Implementado",
+    "business_logic_testing": "✅ Implementado",
+    "vulnerability_correlation": "✅ Implementado",
+    "waf_bypass": "✅ Implementado",
+    "contextual_payloads": "✅ Implementado"
+  },
+  "detailed_results": {
+    "reconnaissance": {
+      "subdomains": [
+        "api.example.com",
+        "admin.example.com",
+        "test.example.com"
+      ],
+      "live_hosts": [
+        "api.example.com",
+        "admin.example.com"
+      ],
+      "open_ports": {
+        "api.example.com": [
+          80,
+          443,
+          8080
+        ],
+        "admin.example.com": [
+          80,
+          443,
+          22
+        ]
+      },
+      "technologies": {
+        "api.example.com": [
+          "nginx",
+          "nodejs",
+          "express"
+        ],
+        "admin.example.com": [
+          "apache",
+          "php",
+          "mysql"
+        ]
+      }
+    },
+    "intelligent_fuzzing": {
+      "discovered_params": {
+        "api.example.com": {
+          "endpoints": [
+            "/api/users",
+            "/api/orders",
+            "/api/products"
+          ],
+          "parameters": {
+            "/api/users": [
+              "id",
+              "email",
+              "role"
+            ],
+            "/api/orders": [
+              "order_id",
+              "user_id",
+              "status"
+            ],
+            "/api/products": [
+              "product_id",
+              "category",
+              "price"
+            ]
+          }
+        }
+      },
+      "fuzzing_results": {
+        "parameter_pollution": {
+          "/api/users?id=1&id=2": "Comportamento inesperado detectado",
+          "/api/orders?user_id=123&user_id=456": "Possível IDOR"
+        },
+        "injection_tests": {
+          "/api/users?id=1'": "Possível SQL Injection",
+          "/api/products?category=<script>": "XSS refletido"
+        },
+        "waf_bypass": {
+          "technique": "URL encoding",
+          "success_rate": "75%",
+          "bypassed_filters": [
+            "XSS",
+            "SQLi"
+          ]
+        }
+      }
+    },
+    "business_logic": {
+      "idor_tests": {
+        "/api/orders/123": {
+          "original_user": "user123",
+          "test_user": "user456",
+          "result": "Acesso negado - Proteção adequada"
+        },
+        "/api/users/profile/789": {
+          "original_user": "user789",
+          "test_user": "user999",
+          "result": "VULNERABILIDADE: Acesso permitido a perfil de outro usuário"
+        }
+      },
+      "business_flow_tests": {
+        "checkout_manipulation": {
+          "scenario": "Alterar preço durante checkout",
+          "steps": [
+            "Adicionar produto ao carrinho",
+            "Interceptar request de checkout",
+            "Modificar campo 'price'",
+            "Enviar request modificado"
+          ],
+          "result": "VULNERABILIDADE: Preço aceito sem validação server-side"
+        },
+        "coupon_reuse": {
+          "scenario": "Reutilizar cupom de desconto",
+          "result": "Proteção adequada - Cupom invalidado após uso"
+        }
+      }
+    },
+    "vulnerability_correlation": {
+      "chain_1": {
+        "description": "Information Disclosure → Privilege Escalation",
+        "steps": [
+          {
+            "vulnerability": "Directory Listing",
+            "endpoint": "/backup/",
+            "impact": "Exposição de arquivos de configuração"
+          },
+          {
+            "vulnerability": "Sensitive File Exposure",
+            "file": "/backup/config.php",
+            "impact": "Credenciais de banco de dados expostas"
+          },
+          {
+            "vulnerability": "Database Access",
+            "impact": "Acesso completo aos dados de usuários"
+          }
+        ],
+        "severity": "CRITICAL",
+        "exploitability": "HIGH"
+      },
+      "chain_2": {
+        "description": "XSS → Session Hijacking → Account Takeover",
+        "steps": [
+          {
+            "vulnerability": "Reflected XSS",
+            "parameter": "search",
+            "impact": "Execução de JavaScript no contexto da vítima"
+          },
+          {
+            "vulnerability": "Session Cookie Theft",
+            "method": "document.cookie",
+            "impact": "Roubo de session token"
+          },
+          {
+            "vulnerability": "Account Takeover",
+            "impact": "Controle total da conta da vítima"
+          }
+        ],
+        "severity": "HIGH",
+        "exploitability": "MEDIUM"
+      }
+    }
+  }
+}

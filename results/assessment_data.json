@@ -1,6 +1,6 @@
 {
-  "target": "https://example.com",
-  "scan_mode": "reconnaissance",
+  "target": "https://newegg.com",
+  "scan_mode": "comprehensive",
   "config": {
     "passive_only": false,
     "deep_scan": false,
@@ -9,13 +9,16 @@
     "output_dir": "./results",
     "report_format": "html"
   },
-  "start_time": "2025-05-28T14:56:24.278453",
+  "start_time": "2025-05-29T16:09:15.436083",
   "modules_executed": [
-    "reconnaissance"
+    "reconnaissance",
+    "web_assessment",
+    "fuzzing",
+    "vulnerability_analysis"
   ],
   "results": {
     "reconnaissance": {
-      "target": "https://example.com",
+      "target": "https://newegg.com",
       "scan_context": {
         "target_type": "url",
         "scan_mode": "reconnaissance",
@@ -55,7 +58,7 @@
             "live_hosts": [],
             "technologies": []
           },
-          "execution_time": 0.20573424799931672
+          "execution_time": 0.1901971669994964
         }
       },
       "aggregated_results": {
@@ -79,7 +82,7 @@
       },
       "ai_analysis": {},
       "summary": {
-        "target": "https://example.com",
+        "target": "https://newegg.com",
         "scan_completed": true,
         "total_tools_used": 1,
         "successful_tools": 0,
@@ -93,8 +96,444 @@
         "recommendations": []
       }
     },
+    "web_assessment": {
+      "target": "https://newegg.com",
+      "technology_detection": {
+        "whatweb": {
+          "error": "whatweb not available"
+        },
+        "custom_detection": {
+          "technologies": [
+            "jQuery"
+          ],
+          "status_code": 400,
+          "content_length": 3801
+        },
+        "headers": {
+          "Server": "AkamaiGHost",
+          "Mime-Version": "1.0",
+          "Content-Length": "3801",
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache",
+          "Expires": "0",
+          "Content-Type": "text/html",
+          "Date": "Thu, 29 May 2025 16:09:15 GMT",
+          "Connection": "keep-alive",
+          "Strict-Transport-Security": "max-age=31536000"
+        },
+        "cookies": {}
+      },
+      "directory_enumeration": {
+        "gobuster": {
+          "error": "gobuster not available"
+        },
+        "common_files": {
+          "found": []
+        },
+        "admin_panels": {
+          "found": []
+        }
+      },
+      "vulnerability_scan": {
+        "error": "nikto not available"
+      },
+      "sql_injection_test": {
+        "sqlmap": {
+          "error": "sqlmap not available"
+        },
+        "manual_tests": {
+          "vulnerable_parameters": []
+        }
+      },
+      "waf_detection": {
+        "wafw00f": {},
+        "custom_detection": {
+          "detected_waf": [
+            "Akamai"
+          ],
+          "status_code": 400,
+          "blocked": false
+        }
+      },
+      "nuclei_scan": {
+        "error": "nuclei not available"
+      },
+      "custom_checks": {
+        "information_disclosure": [
+          {
+            "pattern": "error|Error|ERROR",
+            "description": "Error messages found",
+            "matches": [
+              "Error",
+              "error",
+              "error",
+              "error",
+              "Error"
+            ],
+            "severity": "low"
+          }
+        ],
+        "security_headers": {
+          "missing": [
+            {
+              "header": "X-Frame-Options",
+              "description": "Missing clickjacking protection",
+              "severity": "medium"
+            },
+            {
+              "header": "X-XSS-Protection",
+              "description": "Missing XSS protection",
+              "severity": "medium"
+            },
+            {
+              "header": "X-Content-Type-Options",
+              "description": "Missing MIME type sniffing protection",
+              "severity": "medium"
+            },
+            {
+              "header": "Content-Security-Policy",
+              "description": "Missing CSP header",
+              "severity": "medium"
+            },
+            {
+              "header": "X-Permitted-Cross-Domain-Policies",
+              "description": "Missing cross-domain policy",
+              "severity": "medium"
+            }
+          ],
+          "present": [
+            "Strict-Transport-Security"
+          ]
+        },
+        "ssl_tls_issues": [],
+        "authentication_issues": [],
+        "session_management": []
+      },
+      "summary": {
+        "total_vulnerabilities": 0,
+        "critical": 0,
+        "high": 0,
+        "medium": 0,
+        "low": 0,
+        "info": 0
+      }
+    },
+    "fuzzing": {
+      "target": "https://newegg.com",
+      "directory_fuzzing": {
+        "gobuster": {
+          "error": "gobuster not available"
+        },
+        "wfuzz": {},
+        "ffuf": {},
+        "custom_fuzzing": {
+          "found_paths": []
+        }
+      },
+      "parameter_fuzzing": {
+        "get_parameters": {
+          "findings": [
+            {
+              "parameter": "id",
+              "url": "https://newegg.com?id=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "user",
+              "url": "https://newegg.com?user=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "username",
+              "url": "https://newegg.com?username=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "password",
+              "url": "https://newegg.com?password=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "email",
+              "url": "https://newegg.com?email=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "name",
+              "url": "https://newegg.com?name=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "search",
+              "url": "https://newegg.com?search=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "q",
+              "url": "https://newegg.com?q=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "query",
+              "url": "https://newegg.com?query=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "page",
+              "url": "https://newegg.com?page=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "limit",
+              "url": "https://newegg.com?limit=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "offset",
+              "url": "https://newegg.com?offset=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "sort",
+              "url": "https://newegg.com?sort=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "order",
+              "url": "https://newegg.com?order=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "filter",
+              "url": "https://newegg.com?filter=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "category",
+              "url": "https://newegg.com?category=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "type",
+              "url": "https://newegg.com?type=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "action",
+              "url": "https://newegg.com?action=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "cmd",
+              "url": "https://newegg.com?cmd=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "command",
+              "url": "https://newegg.com?command=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "file",
+              "url": "https://newegg.com?file=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "path",
+              "url": "https://newegg.com?path=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "url",
+              "url": "https://newegg.com?url=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "redirect",
+              "url": "https://newegg.com?redirect=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "return",
+              "url": "https://newegg.com?return=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "callback",
+              "url": "https://newegg.com?callback=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "debug",
+              "url": "https://newegg.com?debug=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "test",
+              "url": "https://newegg.com?test=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "admin",
+              "url": "https://newegg.com?admin=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "token",
+              "url": "https://newegg.com?token=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "session",
+              "url": "https://newegg.com?session=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "key",
+              "url": "https://newegg.com?key=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "api_key",
+              "url": "https://newegg.com?api_key=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "access_token",
+              "url": "https://newegg.com?access_token=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            },
+            {
+              "parameter": "csrf_token",
+              "url": "https://newegg.com?csrf_token=test",
+              "status_code": 400,
+              "reflected": false,
+              "content_length": 3801
+            }
+          ]
+        },
+        "post_parameters": {
+          "findings": []
+        },
+        "hidden_parameters": {}
+      },
+      "header_fuzzing": {
+        "custom_headers": {
+          "findings": []
+        },
+        "header_injection": {
+          "findings": []
+        }
+      },
+      "input_validation": {
+        "xss_testing": {},
+        "command_injection": {},
+        "path_traversal": {},
+        "ldap_injection": {}
+      },
+      "boundary_testing": {
+        "buffer_overflow": {},
+        "integer_overflow": {},
+        "large_inputs": {}
+      },
+      "injection_testing": {
+        "sql_injection": {},
+        "nosql_injection": {},
+        "xml_injection": {},
+        "ldap_injection": {}
+      },
+      "file_upload_testing": {
+        "upload_forms": {
+          "found": [],
+          "count": 0
+        },
+        "file_type_bypass": {},
+        "malicious_uploads": {}
+      },
+      "summary": {
+        "total_findings": 35,
+        "directories_found": 0,
+        "parameters_found": 0,
+        "vulnerabilities": 35
+      }
+    },
+    "vulnerability_analysis": {
+      "vulnerabilities": [],
+      "total_vulnerabilities": 0,
+      "risk_score": 0,
+      "risk_level": "Informational",
+      "vulnerability_categories": {}
+    },
     "reporting": {
-      "html": "reports/security_report_example.com_20250528_145624.html"
+      "html": "reports/security_report_newegg.com_20250529_160922.html"
     }
   },
   "ai_decisions": {
@@ -103,17 +542,20 @@
     }
   },
   "summary": {
-    "target": "https://example.com",
-    "scan_mode": "reconnaissance",
+    "target": "https://newegg.com",
+    "scan_mode": "comprehensive",
     "modules_executed": [
-      "reconnaissance"
+      "reconnaissance",
+      "web_assessment",
+      "fuzzing",
+      "vulnerability_analysis"
     ],
     "total_vulnerabilities": 0,
-    "risk_level": "Unknown",
+    "risk_level": "Informational",
     "key_findings": [],
     "recommendations": [],
     "execution_time": null
   },
   "status": "completed",
-  "end_time": "2025-05-28T14:56:24.519260"
+  "end_time": "2025-05-29T16:09:22.281318"
 }

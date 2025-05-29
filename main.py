@@ -14,11 +14,17 @@ Features:
 - Payload generation and exploitation frameworks
 - Detailed reporting and risk assessment
 - Integration with popular security tools
+- Advanced bug hunting with contextual exploitation
+- Vulnerability correlation and attack path analysis
+- Business logic vulnerability testing
+- AI-powered strategic security analysis
 """
 
 import asyncio
 import argparse
 import sys
+import json
+import time
 from pathlib import Path
 
 # Add the app directory to the Python path
@@ -27,6 +33,7 @@ sys.path.append(str(Path(__file__).parent / "app"))
 from app.core.orchestrator import SecurityOrchestrator
 from app.logger import setup_logging, logger
 from app.llm import LLM
+from app.core.advanced_bug_hunting_orchestrator import AdvancedBugHuntingOrchestrator, BugHuntingConfig
 
 
 def print_banner():
@@ -76,6 +83,12 @@ Examples:
   # Full assessment with all output formats
   python main.py --target example.com --mode comprehensive --format all
   
+  # Advanced bug hunting with AI guidance
+  python main.py --target example.com --mode advanced-bug-hunting --ai-guided
+  
+  # Stealth advanced bug hunting
+  python main.py --target example.com --mode advanced-bug-hunting --stealth-mode --time-constraint quick
+  
   # Custom scan with specific modules excluded
   python main.py --target example.com --mode comprehensive --exclude fuzzer --exclude exploits
   
@@ -98,7 +111,7 @@ Examples:
     # Scan modes
     parser.add_argument(
         '--mode', '-m',
-        choices=['reconnaissance', 'vulnerability-scan', 'web-scan', 'fuzzing', 'comprehensive'],
+        choices=['reconnaissance', 'vulnerability-scan', 'web-scan', 'fuzzing', 'comprehensive', 'advanced-bug-hunting'],
         default='comprehensive',
         help='Scanning mode (default: comprehensive)'
     )
@@ -191,6 +204,62 @@ Examples:
         help='Include only specific modules (can be used multiple times)'
     )
     
+    # Advanced Bug Hunting options
+    parser.add_argument(
+        '--deep-exploitation',
+        action='store_true',
+        default=True,
+        help='Enable deep exploitation techniques (default: enabled)'
+    )
+    
+    parser.add_argument(
+        '--business-logic-focus',
+        action='store_true',
+        default=True,
+        help='Focus on business logic vulnerabilities (default: enabled)'
+    )
+    
+    parser.add_argument(
+        '--privilege-escalation',
+        action='store_true',
+        default=True,
+        help='Test privilege escalation scenarios (default: enabled)'
+    )
+    
+    parser.add_argument(
+        '--stealth-mode',
+        action='store_true',
+        help='Use stealth techniques to avoid detection'
+    )
+    
+    parser.add_argument(
+        '--time-constraint',
+        choices=['quick', 'normal', 'thorough'],
+        default='normal',
+        help='Time constraint for testing (default: normal)'
+    )
+    
+    parser.add_argument(
+        '--max-concurrent',
+        type=int,
+        default=10,
+        help='Maximum concurrent tests (default: 10)'
+    )
+    
+    parser.add_argument(
+        '--ai-guided',
+        action='store_true',
+        default=True,
+        help='Enable AI-guided testing strategies (default: enabled)'
+    )
+    
+    parser.add_argument(
+        '--wordlist-optimization',
+        action='store_true',
+        default=True,
+        help='Enable intelligent wordlist optimization (default: enabled)'
+    )
+    
     # Advanced options
     parser.add_argument(
         '--wordlist',
@@ -226,18 +295,9 @@ Examples:
         help='Enable deep scanning (more thorough but slower)'
     )
     
-    parser.add_argument(
-        '--stealth-mode',
-        action='store_true',
-        help='Enable stealth mode to avoid detection'
-    )
+
     
-    parser.add_argument(
-        '--time-constraint',
-        choices=['fast', 'normal', 'thorough'],
-        default='normal',
-        help='Time constraint for scanning (default: normal)'
-    )
+
     
     # AI/LLM Configuration
     ai_group = parser.add_argument_group('AI Configuration', 'Options for AI-powered tool selection')
@@ -500,22 +560,62 @@ async def main():
         for target in targets:
             logger.info(f"🎯 Starting assessment for target: {target}")
             
-            result = await orchestrator.run_comprehensive_assessment(
-                target=target,
-                scan_mode=args.mode,
-                passive_only=args.passive_only,
-                deep_scan=args.deep_scan,
-                stealth_mode=args.stealth_mode,
-                time_constraint=args.time_constraint,
-                output_dir=args.output,
-                report_format=args.format
-            )
+            # Check if advanced bug hunting mode is requested
+            if args.mode == 'advanced-bug-hunting':
+                # Create advanced bug hunting configuration
+                bug_hunting_config = BugHuntingConfig(
+                    target=target.replace('https://', '').replace('http://', ''),
+                    deep_exploitation=args.deep_exploitation,
+                    business_logic_focus=args.business_logic_focus,
+                    privilege_escalation=args.privilege_escalation,
+                    stealth_mode=args.stealth_mode,
+                    time_constraint=args.time_constraint,
+                    max_concurrent_tests=args.max_concurrent,
+                    ai_guided=args.ai_guided,
+                    wordlist_optimization=args.wordlist_optimization
+                )
+                
+                # Initialize advanced bug hunting orchestrator
+                advanced_orchestrator = AdvancedBugHuntingOrchestrator(
+                    config=bug_hunting_config,
+                    llm_client=llm_client
+                )
+                
+                logger.info("🔥 Starting advanced bug hunting campaign")
+                result = await advanced_orchestrator.execute_comprehensive_bug_hunt()
+                
+                # Add metadata for compatibility
+                result['target'] = target
+                result['mode'] = 'advanced-bug-hunting'
+                result['status'] = 'completed' if 'error' not in result else 'failed'
+                
+            else:
+                # Use standard orchestrator
+                result = await orchestrator.run_comprehensive_assessment(
+                    target=target,
+                    scan_mode=args.mode,
+                    passive_only=args.passive_only,
+                    deep_scan=args.deep_scan,
+                    stealth_mode=args.stealth_mode,
+                    time_constraint=args.time_constraint,
+                    output_dir=args.output,
+                    report_format=args.format
+                )
             
             all_results.append(result)
             
             if not args.quiet:
                 status = "✅" if result.get('status') == 'completed' else "❌"
                 print(f"{status} {target}: {result.get('status', 'unknown')}")
+                
+                # Show advanced bug hunting summary
+                if args.mode == 'advanced-bug-hunting' and result.get('status') == 'completed':
+                    summary = result.get('execution_summary', {})
+                    print(f"   🔍 Vulnerabilities: {summary.get('vulnerabilities_discovered', 0)}")
+                    print(f"   🔗 Chains: {summary.get('vulnerability_chains_found', 0)}")
+                    print(f"   🎯 Attack Paths: {summary.get('attack_paths_identified', 0)}")
+                    print(f"   ⚠️  Critical: {summary.get('critical_findings', 0)}")
+                    print(f"   ⏱️  Time: {summary.get('total_execution_time', 0):.1f}s")
         
         # Aggregate results
         results = {
